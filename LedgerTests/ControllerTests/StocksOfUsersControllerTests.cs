@@ -1,4 +1,4 @@
-namespace Ledger.tests.Ledger.Tests.ControllerTests
+namespace LedgerTests.ControllerTests
 {
     public class StocksOfUsersControllerTests
     {

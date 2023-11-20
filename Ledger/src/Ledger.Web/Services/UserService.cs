@@ -6,7 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Ledger.Ledger.Web.Services
 {
-    public class UserService // User service corresponds to data access tier and handles database operations
+    public interface IUserService
+    {
+        Task<IEnumerable<User>> GetAllUsersAsync();
+        Task<User> GetUserByIdAsync(int id);
+        Task<User> AddUserAsync(User user);
+        Task<User> UpdateUserAsync(int id, User newUser);
+        Task<User> DeleteUserAsync(int id);
+    }
+    
+    public class UserService :IUserService // User service corresponds to data access tier and handles database operations
     {
         private readonly ApiDbContext _dbContext;
 
@@ -25,10 +34,11 @@ namespace Ledger.Ledger.Web.Services
             return await _dbContext.Users.FindAsync(id);
         }
         
-        public async Task AddUserAsync(User user) // ads new user 
+        public async Task<User> AddUserAsync(User user) // ads new user 
         {
             await _dbContext.Users.AddAsync(user);
             await _dbContext.SaveChangesAsync();
+            return user;
         }
         
         public async Task<User> UpdateUserAsync(int id, User newUser) // updates a user and return that user, return null if there is no match
