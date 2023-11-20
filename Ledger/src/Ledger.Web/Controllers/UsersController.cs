@@ -9,9 +9,9 @@ namespace Ledger.Ledger.Web.Controllers
     [ApiController]
     public class UsersController : ControllerBase // This corresponds to the presentation tier and responsible for getting and sending http requests.
     {
-        private readonly UserService _userService;
+        private readonly IUserService _userService;
 
-        public UsersController(UserService userService)
+        public UsersController(IUserService userService)
         {
             _userService = userService;
         }
@@ -40,8 +40,8 @@ namespace Ledger.Ledger.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] User user)
         {
-            await _userService.AddUserAsync(user);
-            return StatusCode(201, new {Message ="New record added successfuly!", User = user});
+            var postedUser = await _userService.AddUserAsync(user);
+            return StatusCode(201, new {Message ="New record added successfuly!", User = postedUser});
         }
 
         // PUT: api/users/id

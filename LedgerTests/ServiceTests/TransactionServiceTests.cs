@@ -1,4 +1,4 @@
-namespace Ledger.tests.Ledger.Tests.ServiceTests
+namespace LedgerTests.ServiceTests
 {
     public class TransactionServiceTests
     {
