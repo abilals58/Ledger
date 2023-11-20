@@ -1,5 +1,5 @@
 using Ledger.Ledger.Web.Data;
-using Ledger.Ledger.Web.Services;
+using Ledger.Ledger.Web.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -15,16 +15,16 @@ namespace Ledger.Ledger.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<ApiDbContext>(option =>
+            services.AddDbContext<IDbContext,ApiDbContext>(option =>
                 option.UseNpgsql(
                     "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;"));
             services.AddSwaggerGen();
-            services.AddScoped<UserService>();
-            services.AddScoped<StockService>();
-            services.AddScoped<StocksOfUserService>();
-            services.AddScoped<BuyOrderService>();
-            services.AddScoped<SellOrderService>();
-            services.AddScoped<TransactionService>();
+            services.AddScoped<IUserRepository,UserRepository>();
+            services.AddScoped<IStockRepository,StockRepository>();
+            services.AddScoped<IStocksOfUserRepository,StocksOfUserRepository>();
+            services.AddScoped<IBuyOrderRepository,BuyOrderRepository>();
+            services.AddScoped<ISellOrderRepository, SellOrderRepository>();
+            services.AddScoped<ITransactionRepository,TransactionRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

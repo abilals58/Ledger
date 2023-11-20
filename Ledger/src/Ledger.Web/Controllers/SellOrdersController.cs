@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
-using Ledger.Ledger.Web.Services;
+using Ledger.Ledger.Web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ledger.Ledger.Web.Controllers
@@ -9,9 +9,9 @@ namespace Ledger.Ledger.Web.Controllers
     [ApiController]
     public class SellOrdersController : ControllerBase // This corresponds to the presentation tier and responsible for getting and sending http requests.
     {
-        private SellOrderService _sellOrderService;
+        private readonly ISellOrderRepository _sellOrderService;
 
-        public SellOrdersController(SellOrderService sellOrderService)
+        public SellOrdersController(ISellOrderRepository sellOrderService)
         {
             _sellOrderService = sellOrderService;
         }

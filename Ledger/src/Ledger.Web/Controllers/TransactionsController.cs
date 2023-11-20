@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
-using Ledger.Ledger.Web.Services;
+using Ledger.Ledger.Web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ledger.Ledger.Web.Controllers
@@ -9,9 +9,9 @@ namespace Ledger.Ledger.Web.Controllers
     [ApiController]
     public class TransactionsController : ControllerBase // This corresponds to the presentation tier and responsible for getting and sending http requests.
     {
-        private TransactionService _transactionService;
+        private readonly ITransactionRepository _transactionService;
 
-        public TransactionsController(TransactionService transactionService)
+        public TransactionsController(ITransactionRepository transactionService)
         {
             _transactionService = transactionService;
         }
