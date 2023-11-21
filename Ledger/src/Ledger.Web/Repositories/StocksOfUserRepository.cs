@@ -17,9 +17,9 @@ namespace Ledger.Ledger.Web.Repositories
     }
     public class StocksOfUserRepository : IStocksOfUserRepository// StocksOfUser service corresponds to data access tier and handles database operations
     {
-        private readonly IDbContext _dbContext;
+        private readonly IStocksOfUserContext _dbContext;
 
-        public StocksOfUserRepository(IDbContext dbContext)
+        public StocksOfUserRepository(IStocksOfUserContext dbContext)
         {
             _dbContext = dbContext;
         }
@@ -28,7 +28,6 @@ namespace Ledger.Ledger.Web.Repositories
         {
             return await _dbContext.StocksOfUser.ToListAsync();
         }
-
         
         public async Task<StocksOfUser> GetStocksOfUserByIdAsync(int id) // returns a stocksofuser by id
         {
@@ -41,7 +40,6 @@ namespace Ledger.Ledger.Web.Repositories
             await _dbContext.StocksOfUser.AddAsync(stocksOfUser);
             await _dbContext.SaveChangesAsync();
         }
-
         
         public async Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser) // update a stocksofuser and return it, returns null if there is no match
         {

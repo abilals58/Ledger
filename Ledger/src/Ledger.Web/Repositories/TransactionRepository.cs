@@ -20,9 +20,9 @@ namespace Ledger.Ledger.Web.Repositories
     public class TransactionRepository : ITransactionRepository // Transaction service corresponds to data tier and handles database operations
 
     {
-    private readonly IDbContext _dbContext;
+    private readonly ITransactionContext _dbContext;
 
-    public TransactionRepository(IDbContext dbContext)
+    public TransactionRepository(ITransactionContext dbContext)
     {
         _dbContext = dbContext;
     }

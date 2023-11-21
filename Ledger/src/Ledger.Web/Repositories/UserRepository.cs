@@ -17,9 +17,9 @@ namespace Ledger.Ledger.Web.Repositories
     
     public class UserRepository :IUserRepository // User service corresponds to data access tier and handles database operations
     {
-        private readonly IDbContext _dbContext;
+        private readonly IUserContext _dbContext;
 
-        public UserRepository(IDbContext dbContext)
+        public UserRepository(IUserContext dbContext)
         {
             _dbContext = dbContext;
         }

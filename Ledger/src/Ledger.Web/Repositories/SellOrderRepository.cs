@@ -16,9 +16,9 @@ namespace Ledger.Ledger.Web.Repositories
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
     {
-        private readonly IDbContext _dbContext;
+        private readonly ISellOrderContext _dbContext;
 
-        public SellOrderRepository(IDbContext dbContext)
+        public SellOrderRepository(ISellOrderContext dbContext)
         {
             _dbContext = dbContext;
         }
