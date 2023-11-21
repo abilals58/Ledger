@@ -1,58 +1,51 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
-using Microsoft.EntityFrameworkCore;
+using Ledger.Ledger.Web.Repositories;
 
 namespace Ledger.Ledger.Web.Services
 {
-    public class StocksOfUserService // StocksOfUser service corresponds to data access tier and handles database operations
+    
+    public interface IStocksOfUserService
     {
-        private readonly ApiDbContext _dbContext;
+        Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync();
+        Task<StocksOfUser> GetStocksOfUserByIdAsync(int id);
+        Task AddStocksOfUserAsync(StocksOfUser stocksOfUser);
+        Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser);
+        Task<StocksOfUser> DeleteStocksOfUserAsync(int id);
+    }
+    public class StocksOfUserService : IStocksOfUserService
+    {
 
-        public StocksOfUserService(ApiDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-        
-        public async Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync() // returns all stocksofusers
-        {
-            return await _dbContext.StocksOfUser.ToListAsync();
-        }
+        private readonly IStocksOfUserRepository _stocksOfUserRepository;
 
-        
-        public async Task<StocksOfUser> GetStocksOfUserByIdAsync(int id) // returns a stocksofuser by id
+        public StocksOfUserService(IStocksOfUserRepository stocksOfUserRepository)
         {
-            return await _dbContext.StocksOfUser.FindAsync(id);
-           
+            _stocksOfUserRepository = stocksOfUserRepository;
         }
-
-        public async Task AddStocksOfUserAsync( StocksOfUser stocksOfUser) // add a stocksofuser
+        public async Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync()
         {
-            await _dbContext.StocksOfUser.AddAsync(stocksOfUser);
-            await _dbContext.SaveChangesAsync();
+            return await _stocksOfUserRepository.GetAllStocksOfUserAsync();
         }
 
-        
-        public async Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser) // update a stocksofuser and return it, returns null if there is no match
+        public async Task<StocksOfUser> GetStocksOfUserByIdAsync(int id)
         {
-            var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(id);
-            if (stocksOfUser == null) return null;
-            stocksOfUser.UserId = newStocksOfUser.UserId;
-            stocksOfUser.StockId = newStocksOfUser.StockId;
-            stocksOfUser.NumOfStocks = newStocksOfUser.NumOfStocks;
-            await _dbContext.SaveChangesAsync();
-            return stocksOfUser;
-
+            return await _stocksOfUserRepository.GetStocksOfUserByIdAsync(id);        
         }
-        
-        public async Task<StocksOfUser> DeleteStocksOfUserAsync(int id) // delete a stocksofuser and return it, return null if there is no match
+
+        public async Task AddStocksOfUserAsync(StocksOfUser stocksOfUser)
         {
-            var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(id);
-            if (stocksOfUser == null) return null;
-            _dbContext.Remove(stocksOfUser);
-            await _dbContext.SaveChangesAsync();
-            return stocksOfUser;
+            await _stocksOfUserRepository.AddStocksOfUserAsync(stocksOfUser);        
+        }
+
+        public async Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser)
+        {
+            return await _stocksOfUserRepository.UpdateStocksOfUserAsync(id, newStocksOfUser);        
+        }
+
+        public async Task<StocksOfUser> DeleteStocksOfUserAsync(int id)
+        {
+            return await _stocksOfUserRepository.DeleteStocksOfUserAsync(id);        
         }
     }
 }

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
-using Microsoft.EntityFrameworkCore;
+using Ledger.Ledger.Web.Repositories;
 
 namespace Ledger.Ledger.Web.Services
 {
@@ -13,57 +12,42 @@ namespace Ledger.Ledger.Web.Services
         Task<User> AddUserAsync(User user);
         Task<User> UpdateUserAsync(int id, User newUser);
         Task<User> DeleteUserAsync(int id);
+
     }
-    
-    public class UserService :IUserService // User service corresponds to data access tier and handles database operations
+
+    public class UserService :IUserService// bussiness logic layer, uses repository layer
     {
-        private readonly ApiDbContext _dbContext;
+        private readonly IUserRepository _userRepository;
+        public UserService(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
 
-        public UserService(ApiDbContext dbContext)
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
         {
-            _dbContext = dbContext;
+            return await _userRepository.GetAllUsersAsync();
         }
-        
-        public async Task<IEnumerable<User>> GetAllUsersAsync() // returns all users 
-        {
-            return await _dbContext.Users.ToListAsync();
-        }
-        
-        public async Task<User> GetUserByIdAsync(int id) // returns a user by id, return null if there is no match
-        {
-            return await _dbContext.Users.FindAsync(id);
-        }
-        
-        public async Task<User> AddUserAsync(User user) // ads new user 
-        {
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
-            return user;
-        }
-        
-        public async Task<User> UpdateUserAsync(int id, User newUser) // updates a user and return that user, return null if there is no match
-        {
-            var user = await _dbContext.Users.FindAsync(id);
-            if (user == null) return null;
-            user.Name = newUser.Name;
-            user.Surname = newUser.Surname;
-            user.UserName = newUser.UserName;
-            user.Email = newUser.Email;
-            user.Password = newUser.Password;
-            user.Phone = newUser.Phone;
-            await _dbContext.SaveChangesAsync();
-            return user;
-        }
-        
-        public async Task<User> DeleteUserAsync(int id) // deletes a user, return null if there is no match
-        {
-            var user = await _dbContext.Users.FindAsync(id);
-            if (user == null) return null;
-            _dbContext.Users.Remove(user);
-            await _dbContext.SaveChangesAsync();
 
-            return user;
+        public async Task<User> GetUserByIdAsync(int id)
+        {
+            return await _userRepository.GetUserByIdAsync(id);
 
         }
+
+        public async Task<User> AddUserAsync(User user)
+        {
+            return await _userRepository.AddUserAsync(user);
+        }
+
+        public async Task<User> UpdateUserAsync(int id, User newUser)
+        {
+            return await _userRepository.UpdateUserAsync(id, newUser);
+        }
+
+        public async Task<User> DeleteUserAsync(int id)
+        {
+            return await _userRepository.DeleteUserAsync(id);
+        }
+        
     }
 }

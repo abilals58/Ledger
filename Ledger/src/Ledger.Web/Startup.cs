@@ -1,4 +1,5 @@
 using Ledger.Ledger.Web.Data;
+using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,17 +15,34 @@ namespace Ledger.Ledger.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var pgString = "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
-            services.AddDbContext<ApiDbContext>(option =>
-                option.UseNpgsql(
-                    "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;"));
-            services.AddSwaggerGen();
-            services.AddScoped<UserService>();
-            services.AddScoped<StockService>();
-            services.AddScoped<StocksOfUserService>();
-            services.AddScoped<BuyOrderService>();
-            services.AddScoped<SellOrderService>();
-            services.AddScoped<TransactionService>();
+            // add dbcontext
+            services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
+            services.AddSwaggerGen(); // add swagger
+            // add interfaces for dbcontext (connection to database, database layer)
+            services.AddScoped<IUserContext,ApiDbContext>();
+            services.AddScoped<IStockContext,ApiDbContext>();
+            services.AddScoped<IStocksOfUserContext,ApiDbContext>();
+            services.AddScoped<IBuyOrderContext,ApiDbContext>();
+            services.AddScoped<ISellOrderContext,ApiDbContext>();
+            services.AddScoped<ITransactionContext,ApiDbContext>();
+            
+            // add interfaces and repositories for data repository layer (data access)
+            services.AddScoped<IUserRepository,UserRepository>();
+            services.AddScoped<IStockRepository,StockRepository>();
+            services.AddScoped<IStocksOfUserRepository,StocksOfUserRepository>();
+            services.AddScoped<IBuyOrderRepository,BuyOrderRepository>();
+            services.AddScoped<ISellOrderRepository, SellOrderRepository>();
+            services.AddScoped<ITransactionRepository,TransactionRepository>();
+            
+            // add interfaces and services for bussiness layer
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IStockService, StockService>();
+            services.AddScoped<IStocksOfUserService, StocksOfUserService>();
+            services.AddScoped<IBuyOrderService, BuyOrderService>();
+            services.AddScoped<ISellOrderService, SellOrderService>();
+            services.AddScoped<ITransactionService, TransactionService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

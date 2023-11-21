@@ -1,61 +1,50 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
-using Microsoft.EntityFrameworkCore;
+using Ledger.Ledger.Web.Repositories;
 
 namespace Ledger.Ledger.Web.Services
 {
-    public class StockService
+    
+    public interface IStockService
     {
-        private readonly ApiDbContext _dbContext;
+        Task<IEnumerable<Stock>> GetAllStocksAsync();
+        Task<Stock> GetStockByIdAsync(int id);
+        Task AddStockAsync(Stock stock);
+        Task<Stock> UpdateStockAsync(int id, Stock newStock);
+        Task<Stock> DeleteStockAsync(int id);
+    }
+    public class StockService :IStockService
+    {
+        private readonly IStockRepository _stockRepository;
 
-        public StockService(ApiDbContext dbContext) // Stock service corresponds to data access tier and handles database operations
+        public StockService(IStockRepository stockRepository)
         {
-            _dbContext = dbContext;
+            _stockRepository = stockRepository;
         }
-        
-        
-        public async Task<IEnumerable<Stock>> GetAllStocksAsync() // returns all stocks
+        public async Task<IEnumerable<Stock>> GetAllStocksAsync()
         {
-            return await _dbContext.Stocks.ToListAsync();
+            return await _stockRepository.GetAllStocksAsync();
         }
-        
-        public async Task<Stock> GetStockByIdAsync(int id) // returns a stock by id
+
+        public async Task<Stock> GetStockByIdAsync(int id)
         {
-            return await _dbContext.Stocks.FindAsync(id);
-            
+            return await _stockRepository.GetStockByIdAsync(id);
         }
-        
-        public async Task AddStockAsync(Stock stock)  // adds a stock to the database
+
+        public async Task AddStockAsync(Stock stock)
         {
-            await _dbContext.Stocks.AddAsync(stock);
-            await _dbContext.SaveChangesAsync();
-            
+            await _stockRepository.AddStockAsync(stock);        
         }
-        
-        public async Task<Stock> UpdateStockAsync(int id, Stock newStock) // updates the stock and returns that stock, returns null if there is no match 
+
+        public async Task<Stock> UpdateStockAsync(int id, Stock newStock)
         {
-            var stock = await _dbContext.Stocks.FindAsync(id);
-            if (stock == null) return null;
-            stock.StockName = newStock.StockName;
-            stock.OpenDate = newStock.OpenDate;
-            stock.InitialStock = newStock.InitialStock;
-            stock.InitialPrice = newStock.InitialPrice;
-            stock.CurrentStock = newStock.CurrentStock;
-            stock.CurrentPrice = newStock.CurrentPrice;
-            await _dbContext.SaveChangesAsync();
-            return stock;
+            return await _stockRepository.UpdateStockAsync(id, newStock);        
         }
-        
-        public async Task<Stock> DeleteStockAsync(int id) // deletes a stock and returns that stock, returns null if there is no match
+
+        public async Task<Stock> DeleteStockAsync(int id)
         {
-            var stock = await _dbContext.Stocks.FindAsync(id);
-            if (stock == null) return null;
-            _dbContext.Remove(stock);
-            await _dbContext.SaveChangesAsync();
-            return stock;
+            return await _stockRepository.DeleteStockAsync(id);        
         }
-        
     }
 }

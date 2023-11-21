@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Controllers;
 using Ledger.Ledger.Web.Models;
-using Ledger.Ledger.Web.Services;
+using Ledger.Ledger.Web.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -25,7 +25,7 @@ namespace LedgerTests.ControllerTests
                 new User {UserId = 2, Name = "Yusuf",Surname = "Colak", UserName = "ycolak", Email = "ycolak@gmail.com", Password = "123424", Phone = "5353519982"}
             };
             
-            var userServiceMock = new Mock<IUserService>(); // this is the mock version of userService with the test purpose
+            var userServiceMock = new Mock<IUserRepository>(); // this is the mock version of userService with the test purpose
             userServiceMock.Setup(service => service.GetAllUsersAsync()).ReturnsAsync(users);
             
             var controller = new UsersController(userServiceMock.Object);
@@ -51,7 +51,7 @@ namespace LedgerTests.ControllerTests
                 Password = "123458", Phone = "5343519032"
             };
             
-            var userServiceMock = new Mock<IUserService>(); // this is the mock version of userService with the test purpose
+            var userServiceMock = new Mock<IUserRepository>(); // this is the mock version of userService with the test purpose
             userServiceMock.Setup(service => service.GetUserByIdAsync(id)).ReturnsAsync(user);
             var controller = new UsersController(userServiceMock.Object);
             
@@ -72,7 +72,7 @@ namespace LedgerTests.ControllerTests
             //arrange
             var id = 1;
             
-            var userServiceMock = new Mock<IUserService>(); // this is the mock version of userService with the test purpose
+            var userServiceMock = new Mock<IUserRepository>(); // this is the mock version of userService with the test purpose
             userServiceMock.Setup(service => service.GetUserByIdAsync(id)).ReturnsAsync(null as User);
             var controller = new UsersController(userServiceMock.Object);
             
@@ -91,7 +91,7 @@ namespace LedgerTests.ControllerTests
                 { Name = "Ahmet", Surname = "Yildiz", UserName = "abilal", Email = "abilal@gmail.com",Password = "123458", Phone = "5343519032" };
             var createdUser = new User 
                 { UserId = 1, Name = "Ahmet", Surname = "Yildiz", UserName = "abilal", Email = "abilal@gmail.com", Password = "123458", Phone = "5343519032" };
-            var userServiceMock = new Mock<IUserService>(); // this is the mock version of userService with the test purpose
+            var userServiceMock = new Mock<IUserRepository>(); // this is the mock version of userService with the test purpose
             userServiceMock.Setup(x => x.AddUserAsync(userToAdd)).ReturnsAsync(createdUser);
             var controller = new UsersController(userServiceMock.Object);
             
@@ -116,7 +116,7 @@ namespace LedgerTests.ControllerTests
                 { Name = "Ahmet", Surname = "Yildiz", UserName = "abilals", Email = "abilal@gmail.com",Password = "123458", Phone = "5343519032" };
             var updatedUser = new User 
                 { UserId = id, Name = "Ahmet", Surname = "Yildiz", UserName = "abilals", Email = "abilal@gmail.com", Password = "123458", Phone = "5343519032" };
-            var userServiceMock = new Mock<IUserService>(); // this is the mock version of userService with the test purpose
+            var userServiceMock = new Mock<IUserRepository>(); // this is the mock version of userService with the test purpose
             userServiceMock.Setup(x => x.UpdateUserAsync(id, userToUpdate)).ReturnsAsync(userToUpdate);
             var controller = new UsersController(userServiceMock.Object);
             
@@ -141,7 +141,7 @@ namespace LedgerTests.ControllerTests
                 Password = "123458", Phone = "5343519032"
             };
             
-            var userServiceMock = new Mock<IUserService>(); // this is the mock version of userService with the test purpose
+            var userServiceMock = new Mock<IUserRepository>(); // this is the mock version of userService with the test purpose
             userServiceMock.Setup(service => service.DeleteUserAsync(id)).ReturnsAsync(user);
             var controller = new UsersController(userServiceMock.Object);
             

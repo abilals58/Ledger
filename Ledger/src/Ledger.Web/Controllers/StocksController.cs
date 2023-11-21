@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
+using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,9 +10,9 @@ namespace Ledger.Ledger.Web.Controllers
     [ApiController]
     public class StocksController : ControllerBase // This corresponds to the presentation tier and responsible for getting and sending http requests.
     {
-        private StockService _stockService;
+        private readonly IStockService _stockService;
 
-        public StocksController(StockService stockService)
+        public StocksController(IStockService stockService)
         {
             _stockService = stockService;
         }
