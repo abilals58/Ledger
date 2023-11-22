@@ -63,7 +63,6 @@ namespace Ledger.Ledger.Web.Repositories
             await _dbContext.SaveChangesAsync();
 
             return user;
-
         }
     }
 }
