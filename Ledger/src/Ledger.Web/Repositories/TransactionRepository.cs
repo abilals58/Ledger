@@ -11,7 +11,7 @@ namespace Ledger.Ledger.Web.Repositories
     {
         Task<IEnumerable<Transaction>> GetAlTransactionsAsync();
         Task<Transaction> GetTransactionByIdAsync(int id);
-        Task AddTransactionAsync(Transaction transaction);
+        Task<Transaction> AddTransactionAsync(Transaction transaction);
         Task<Transaction> UpdateTransactionAsync(int id, Transaction newtransaction);
         Task<Transaction> DeleteTransactionAsync(int id);
         
@@ -35,13 +35,13 @@ namespace Ledger.Ledger.Web.Repositories
     public async Task<Transaction> GetTransactionByIdAsync(int id) // returns a transaction by id
     {
         return await _dbContext.Transactions.FindAsync(id);
-
     }
 
-    public async Task AddTransactionAsync(Transaction transaction) // adds a transaction to the database
+    public async Task<Transaction> AddTransactionAsync(Transaction transaction) // adds a transaction to the database and returns the added transaction
     {
         await _dbContext.Transactions.AddAsync(transaction);
         await _dbContext.SaveChangesAsync();
+        return transaction;
     }
 
     public async Task<Transaction> UpdateTransactionAsync(int id, Transaction newtransaction) // updates a transaction and returns it, returns null if there is no match

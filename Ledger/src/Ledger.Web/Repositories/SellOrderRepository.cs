@@ -10,7 +10,7 @@ namespace Ledger.Ledger.Web.Repositories
     {
         Task<IEnumerable<SellOrder>> GetAllSellOrdersAsync();
         Task<SellOrder> GetSellOrderByIdAsync(int id);
-        Task AddSellOrderAsync(SellOrder sellOrder);
+        Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder);
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
     }
@@ -34,10 +34,11 @@ namespace Ledger.Ledger.Web.Repositories
             
         }
         
-        public async Task AddSellOrderAsync(SellOrder sellOrder) // adds a sellorder to the database
+        public async Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder) // adds a sellorder to the database
         {
             await _dbContext.SellOrders.AddAsync(sellOrder);
             await _dbContext.SaveChangesAsync();
+            return sellOrder;
         }
         
         public async Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder) // updates a sellorder and returns it, returns null if there is no match

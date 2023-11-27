@@ -10,7 +10,7 @@ namespace Ledger.Ledger.Web.Models
     {
     [Key] public int? StockId { get; set; } // randomly generated integer value
     public string StockName { get; set; }
-    public DateTime OpenDate { get; set; }
+    public DateTime OpenDate { get; set; } = DateTime.Now;
     public int InitialStock { get; set; }
     public double InitialPrice { get; set; }
     public int CurrentStock { get; set; }

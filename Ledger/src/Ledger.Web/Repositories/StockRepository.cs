@@ -10,7 +10,7 @@ namespace Ledger.Ledger.Web.Repositories
     {
         Task<IEnumerable<Stock>> GetAllStocksAsync();
         Task<Stock> GetStockByIdAsync(int id);
-        Task AddStockAsync(Stock stock);
+        Task<Stock> AddStockAsync(Stock stock);
         Task<Stock> UpdateStockAsync(int id, Stock newStock);
         Task<Stock> DeleteStockAsync(int id);
     }
@@ -34,11 +34,11 @@ namespace Ledger.Ledger.Web.Repositories
             
         }
         
-        public async Task AddStockAsync(Stock stock)  // adds a stock to the database
+        public async Task<Stock> AddStockAsync(Stock stock)  // adds a stock to the database
         {
             await _dbContext.Stocks.AddAsync(stock);
             await _dbContext.SaveChangesAsync();
-            
+            return stock;
         }
         
         public async Task<Stock> UpdateStockAsync(int id, Stock newStock) // updates the stock and returns that stock, returns null if there is no match 

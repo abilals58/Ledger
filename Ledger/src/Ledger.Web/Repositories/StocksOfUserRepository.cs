@@ -11,7 +11,7 @@ namespace Ledger.Ledger.Web.Repositories
     {
         Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync();
         Task<StocksOfUser> GetStocksOfUserByIdAsync(int id);
-        Task AddStocksOfUserAsync(StocksOfUser stocksOfUser);
+        Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser);
         Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser);
         Task<StocksOfUser> DeleteStocksOfUserAsync(int id);
     }
@@ -35,10 +35,11 @@ namespace Ledger.Ledger.Web.Repositories
            
         }
 
-        public async Task AddStocksOfUserAsync( StocksOfUser stocksOfUser) // add a stocksofuser
+        public async Task<StocksOfUser> AddStocksOfUserAsync( StocksOfUser stocksOfUser) // add a stocksofuser
         {
             await _dbContext.StocksOfUser.AddAsync(stocksOfUser);
             await _dbContext.SaveChangesAsync();
+            return stocksOfUser;
         }
         
         public async Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser) // update a stocksofuser and return it, returns null if there is no match

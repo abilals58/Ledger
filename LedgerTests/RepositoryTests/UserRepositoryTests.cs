@@ -87,7 +87,7 @@ namespace LedgerTests.RepositoryTests
             var dbContext = new ApiDbContext(options);
             var userRepository = new UserRepository(dbContext);
             // add new user (test purpose)
-            var id = 5;
+            var id = 6;
             var user = new User { Name = "  Emre", Surname = "Yildiz", UserName = "eyildiz",Email = "eyildiz@gmail.com",Password = "123458", Phone = "5343519032" };
             await userRepository.AddUserAsync(user);
             // Act delete the user
