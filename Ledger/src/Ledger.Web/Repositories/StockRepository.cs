@@ -16,9 +16,9 @@ namespace Ledger.Ledger.Web.Repositories
     }
     public class StockRepository : IStockRepository
     {
-        private readonly IStockContext _dbContext;
+        private readonly IDbContext _dbContext;
 
-        public StockRepository(IStockContext dbContext) // Stock service corresponds to data access tier and handles database operations
+        public StockRepository(IDbContext dbContext) // Stock service corresponds to data access tier and handles database operations
         {
             _dbContext = dbContext;
         }

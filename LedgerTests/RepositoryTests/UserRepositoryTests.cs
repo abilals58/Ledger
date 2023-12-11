@@ -29,7 +29,7 @@ namespace LedgerTests.RepositoryTests
         }
         
         [Fact]
-        public async Task GetUserByIdAsync_ShouldReturnAUsers()
+        public async Task GetUserByIdAsync_ShouldReturnAUser()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;
@@ -44,7 +44,7 @@ namespace LedgerTests.RepositoryTests
         }
         
         [Fact]
-        public async Task AddUsersAsync_ShouldReturnAddedUser()
+        public async Task AddUserAsync_ShouldReturnAddedUser()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;
@@ -60,7 +60,7 @@ namespace LedgerTests.RepositoryTests
         }
 
         [Fact]
-        public async Task UpdateUsersAsync_ShouldReturnUpdatedUser()
+        public async Task UpdateUserAsync_ShouldReturnUpdatedUser()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>()
@@ -80,7 +80,7 @@ namespace LedgerTests.RepositoryTests
         }
         
         [Fact]
-        public async Task DeleteUsersAsync_ShouldReturnDeletedUser()
+        public async Task DeleteUserAsync_ShouldReturnDeletedUser()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;

@@ -17,9 +17,9 @@ namespace Ledger.Ledger.Web.Repositories
     }
     public class StocksOfUserRepository : IStocksOfUserRepository// StocksOfUser service corresponds to data access tier and handles database operations
     {
-        private readonly IStocksOfUserContext _dbContext;
+        private readonly IDbContext _dbContext;
 
-        public StocksOfUserRepository(IStocksOfUserContext dbContext)
+        public StocksOfUserRepository(IDbContext dbContext)
         {
             _dbContext = dbContext;
         }

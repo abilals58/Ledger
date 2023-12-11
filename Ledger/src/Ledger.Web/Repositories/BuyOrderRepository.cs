@@ -19,9 +19,9 @@ namespace Ledger.Ledger.Web.Repositories
     public class BuyOrderRepository : IBuyOrderRepository // BuyOrder service coresponds to data tier and handes database operations 
 
     {
-    private readonly IBuyOrderContext _dbContext;
+    private readonly IDbContext _dbContext;
 
-    public BuyOrderRepository(IBuyOrderContext dbContext)
+    public BuyOrderRepository(IDbContext dbContext)
     {
         _dbContext = dbContext;
     }

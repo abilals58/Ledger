@@ -21,13 +21,7 @@ namespace Ledger.Ledger.Web
             services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
             services.AddSwaggerGen(); // add swagger
             // add interfaces for dbcontext (connection to database, database layer)
-            services.AddScoped<IUserContext,ApiDbContext>();
-            services.AddScoped<IStockContext,ApiDbContext>();
-            services.AddScoped<IStocksOfUserContext,ApiDbContext>();
-            services.AddScoped<IBuyOrderContext,ApiDbContext>();
-            services.AddScoped<ISellOrderContext,ApiDbContext>();
-            services.AddScoped<ITransactionContext,ApiDbContext>();
-            
+            services.AddScoped<IDbContext,ApiDbContext>();
             // add interfaces and repositories for data repository layer (data access)
             services.AddScoped<IUserRepository,UserRepository>();
             services.AddScoped<IStockRepository,StockRepository>();

@@ -11,7 +11,7 @@ namespace LedgerTests.RepositoryTests
     public class BuyOrderRepositoryTests
     {
         [Fact]
-        public async Task GetAllUsersAsync_ShouldReturnAllUsers()
+        public async Task GetAllBuyOrdersAsync_ShouldReturnAllBuyOrders()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;
@@ -26,7 +26,7 @@ namespace LedgerTests.RepositoryTests
         }
         
         [Fact]
-        public async Task GetUserByIdAsync_ShouldReturnAUsers()
+        public async Task GetBuyOrderByIdAsync_ShouldReturnABuyOrder()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;
@@ -40,7 +40,7 @@ namespace LedgerTests.RepositoryTests
         }
         
         [Fact]
-        public async Task AddUsersAsync_ShouldReturnAddedUser()
+        public async Task AddBuyOrderAsync_ShouldReturnAddedBuyOrder()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;
@@ -56,7 +56,7 @@ namespace LedgerTests.RepositoryTests
         }
 
         [Fact]
-        public async Task UpdateUsersAsync_ShouldReturnUpdatedUser()
+        public async Task UpdateBuyOrderAsync_ShouldReturnUpdatedBuyOrder()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>()
@@ -74,7 +74,7 @@ namespace LedgerTests.RepositoryTests
         }
         
         [Fact]
-        public async Task DeleteUsersAsync_ShouldReturnDeletedUser()
+        public async Task DeleteBuyOrderAsync_ShouldReturnDeletedBuyOrder()
         {
             // arrange
             var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;").Options;

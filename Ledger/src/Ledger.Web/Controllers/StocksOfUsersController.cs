@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ledger.Ledger.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api.ledger.com/v1/[controller]")]
     [ApiController]
     public class StocksOfUsersController : ControllerBase // This corresponds to the presentation tier and responsible for getting and sending http requests.
     {
