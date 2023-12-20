@@ -8,29 +8,35 @@ namespace Ledger.Ledger.Web.Models
                        // the stock opens to the market and CurrentStock and CurrentPrice values are updated according to the transactions (buy/sell) operations in the market.
 
     {
-    [Key] public int? StockId { get; set; } // randomly generated integer value
+    [Key] public int StockId { get; set; } // randomly generated integer value
     public string StockName { get; set; }
     public DateTime OpenDate { get; set; } = DateTime.Now;
     public int InitialStock { get; set; }
     public double InitialPrice { get; set; }
     public int CurrentStock { get; set; }
     public double CurrentPrice { get; set; }
+    public double HighestPrice { get; set; }
+    public double LowestPrice { get; set; }
+    public bool Status { get; set; } = true; //true:active, false:deactive
+    
 
     public Stock()
     {
 
     }
 
-    public Stock(int stockId, string stockName, DateTime openDate, int initialStock, double initialPrice,
-        int currentStock, double currentPrice)
+    public Stock(int stockId, string stockName, int initialStock, double initialPrice, int currentStock, double currentPrice, double highestPrice, double lowestPrice, bool status)
     {
         StockId = stockId;
         StockName = stockName;
-        OpenDate = openDate;
         InitialStock = initialStock;
         InitialPrice = initialPrice;
         CurrentStock = currentStock;
         CurrentPrice = currentPrice;
+        HighestPrice = highestPrice;
+        LowestPrice = lowestPrice;
+        Status = status;
     }
+    
     }
 }

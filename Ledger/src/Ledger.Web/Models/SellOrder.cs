@@ -14,6 +14,9 @@ namespace Ledger.Ledger.Web.Models
         public  double AskPrice { get; set; }
         public  int AskSize { get; set; }
         public  DateTime DateCreated { get; set; } = DateTime.Now;
+        public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,sell order is active from startdate to enddate
+        public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
+        
         
         [ForeignKey("UserId")]
         public User User { get; set; } //navigation property
@@ -26,14 +29,15 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public SellOrder(int sellOrderId, int userId, int stockId, double askPrice, int askSize, DateTime dateCreated)
+        public SellOrder(int? sellOrderId, int? userId, int? stockId, double askPrice, int askSize, User user, Stock stock)
         {
             SellOrderId = sellOrderId;
             UserId = userId;
             StockId = stockId;
             AskPrice = askPrice;
             AskSize = askSize;
-            DateCreated = dateCreated;
+            User = user;
+            Stock = stock;
         }
     }
 }

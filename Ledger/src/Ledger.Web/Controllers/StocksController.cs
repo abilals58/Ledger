@@ -69,5 +69,25 @@ namespace Ledger.Ledger.Web.Controllers
             }
             return Ok(new {Message = "Stock with given id deleted successfuly!", Stock = stock});
         }
+        
+        ///Bussiness operations
+        // GET: api/stocks/maindata
+        [HttpGet("maindata")]
+        public async Task<IActionResult> GetMainData()
+        {
+            return Ok(await _stockService.RetrieveAllStockInfo());
+        }
+        
+        // PUT: api/stocks/id
+        [HttpPut("{id}/{newprice}")]
+        public async Task<IActionResult> Put(int id,double newprice)
+        {
+            var stock = await _stockService.UpdateAStockPrice(id, newprice);
+            if (stock == null)
+            {
+                return NotFound("Stock with given id does not exist in the database!");
+            }
+            return Ok(new {Message = "Stock with given id updated successfuly!", Stock = stock});
+        }
     }
 }

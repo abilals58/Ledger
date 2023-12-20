@@ -18,7 +18,8 @@ namespace Ledger.Ledger.Web
             var pgString = "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
             // add dbcontext
-            services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
+            //services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
+            services.AddDbContext<ApiDbContext>(option => option.UseInMemoryDatabase("Ledger"));
             services.AddSwaggerGen(); // add swagger
             // add interfaces for dbcontext (connection to database, database layer)
             services.AddScoped<IDbContext,ApiDbContext>();

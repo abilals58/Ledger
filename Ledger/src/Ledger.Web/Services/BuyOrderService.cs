@@ -13,7 +13,6 @@ namespace Ledger.Ledger.Web.Services
         Task AddBuyOrderAsync(BuyOrder buyOrder);
         Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder);
         Task<BuyOrder> DeleteBuyOrderAsync(int id);
-        
     }
     public class BuyOrderService :IBuyOrderService
     {
@@ -43,5 +42,6 @@ namespace Ledger.Ledger.Web.Services
         public async Task<BuyOrder> DeleteBuyOrderAsync(int id)
         {
             return await _buyOrderRepository.DeleteBuyOrderAsync(id);        }
+        
     }
 }

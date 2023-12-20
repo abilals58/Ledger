@@ -115,3 +115,4 @@
 /Users/ahyildiz/RiderProjects/Ledger/Ledger/bin/Debug/net5.0/xunit.assert.dll
 /Users/ahyildiz/RiderProjects/Ledger/Ledger/bin/Debug/net5.0/xunit.core.dll
 /Users/ahyildiz/RiderProjects/Ledger/Ledger/bin/Debug/net5.0/xunit.execution.dotnet.dll
+/Users/ahyildiz/RiderProjects/Ledger/Ledger/bin/Debug/net5.0/Microsoft.EntityFrameworkCore.InMemory.dll

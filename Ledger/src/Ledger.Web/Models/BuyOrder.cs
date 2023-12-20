@@ -14,6 +14,8 @@ namespace Ledger.Ledger.Web.Models
         public  double BidPrice { get; set; }
         public  int BidSize { get; set; }
         public  DateTime DateCreated { get; set; } = DateTime.Now;
+        public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,buy order is active from startdate to enddate
+        public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
         
         [ForeignKey("UserId")]
         public User User { get; set; } //navigation property

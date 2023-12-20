@@ -54,6 +54,8 @@ namespace Ledger.Ledger.Web.Repositories
         buyOrder.BidPrice = newbuyOrder.BidSize;
         buyOrder.BidSize = newbuyOrder.BidSize;
         buyOrder.DateCreated = newbuyOrder.DateCreated;
+        buyOrder.StartDate = newbuyOrder.StartDate;
+        buyOrder.EndDate = newbuyOrder.EndDate;
         await _dbContext.SaveChangesAsync();
         return buyOrder;
     }

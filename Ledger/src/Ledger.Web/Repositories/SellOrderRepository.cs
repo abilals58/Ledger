@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
@@ -13,6 +14,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder);
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
+        Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId);
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
     {
@@ -50,6 +52,8 @@ namespace Ledger.Ledger.Web.Repositories
             sellOrder.AskPrice = newSellOrder.AskPrice;
             sellOrder.AskSize = newSellOrder.AskSize;
             sellOrder.DateCreated = newSellOrder.DateCreated;
+            sellOrder.StartDate = newSellOrder.StartDate;
+            sellOrder.EndDate = newSellOrder.EndDate;
             await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
@@ -62,6 +66,18 @@ namespace Ledger.Ledger.Web.Repositories
             await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
-        
+
+        public async Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId)
+        {
+            //find buyorder by given id
+            var buyorder = await _dbContext.BuyOrders.FindAsync(buyorderId);
+            if (buyorder == null)
+            {
+                return null;
+            }
+            var stockid = buyorder.StockId;
+            var price = buyorder.BidPrice;
+            return await _dbContext.SellOrders.Where(s => s.StockId == stockid && s.AskPrice == price).ToListAsync();
+        }
     }
 }

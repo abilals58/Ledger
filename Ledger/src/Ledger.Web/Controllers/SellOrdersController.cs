@@ -16,6 +16,8 @@ namespace Ledger.Ledger.Web.Controllers
         {
             _sellOrderService = sellOrderService;
         }
+        //CRUD OPERATIONS
+        
         // GET: api/sellorders
         [HttpGet]
         public async Task<IActionResult> Get()
@@ -67,6 +69,20 @@ namespace Ledger.Ledger.Web.Controllers
             }
             
             return Ok(new {Message = "SellOrder with given id deleted successfuly!", SellOrder = sellOrder});
+        }
+        
+        //BUSSINESS OPERATIONS
+        [HttpGet("{buyorderId}/{bidSize}")]
+
+        public async Task<IActionResult> MatchedSellOrders(int buyorderId, int bidSize)
+        {
+            var sellOrders = await _sellOrderService.MatchSellOrdersAsync(buyorderId, bidSize);
+            if (sellOrders.Count == 0)
+            {
+                return NotFound("No match with given stock and price!");
+            }
+
+            return Ok(new { Message = "Some matches are found!", MatchList = sellOrders });
         }
     }
 }

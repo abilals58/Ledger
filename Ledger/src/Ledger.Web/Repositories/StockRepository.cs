@@ -13,6 +13,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task<Stock> AddStockAsync(Stock stock);
         Task<Stock> UpdateStockAsync(int id, Stock newStock);
         Task<Stock> DeleteStockAsync(int id);
+        
     }
     public class StockRepository : IStockRepository
     {
@@ -51,6 +52,9 @@ namespace Ledger.Ledger.Web.Repositories
             stock.InitialPrice = newStock.InitialPrice;
             stock.CurrentStock = newStock.CurrentStock;
             stock.CurrentPrice = newStock.CurrentPrice;
+            stock.HighestPrice = newStock.HighestPrice;
+            stock.LowestPrice = newStock.LowestPrice;
+            stock.Status = newStock.Status;
             await _dbContext.SaveChangesAsync();
             return stock;
         }
