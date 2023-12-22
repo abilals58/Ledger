@@ -74,11 +74,12 @@ namespace Ledger.Ledger.Web.Services
             return allStocksData;
         }
 
-        public async Task<Stock> UpdateAStockPrice(int id,double newPrice)
+        
+
+        /*public async Task<Stock> UpdateAStockPrice(int id,double newPrice)
         {
             var stock = await _stockRepository.GetStockByIdAsync(id);
             if (stock == null) return null;
-
             
             if (newPrice < stock.LowestPrice) //update lowest price and current price
             {
@@ -100,6 +101,32 @@ namespace Ledger.Ledger.Web.Services
                     stock.CurrentStock, newPrice, stock.HighestPrice, stock.LowestPrice, stock.Status);
                 return await _stockRepository.UpdateStockAsync(stock.StockId, newStock);
             }
+        }*/
+        /*public async Task<Stock> UpdateAStockPrice(int id,double newPrice)
+        {
+            var stock = await _stockRepository.GetStockByIdAsync(id);
+            if (stock == null) return null;
+            
+            if (newPrice < stock.LowestPrice) //update lowest price and current price as newPrice
+            {
+                return await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
+            }
+
+            if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
+            {
+                return await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
+            }
+            else // update only current price
+            {
+                var newStock = new Stock(stock.StockId, stock.StockName, stock.InitialStock, stock.InitialPrice,
+                    stock.CurrentStock, newPrice, stock.HighestPrice, stock.LowestPrice, stock.Status);
+                return await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
+            }
+        }*/
+        
+        public async Task<Stock> UpdateAStockPrice(int id, double newPrice)
+        {
+            return await _stockRepository.UpdateStockPriceAsync(id, newPrice);
         }
     }
 }

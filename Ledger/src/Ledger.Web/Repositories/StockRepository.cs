@@ -13,7 +13,10 @@ namespace Ledger.Ledger.Web.Repositories
         Task<Stock> AddStockAsync(Stock stock);
         Task<Stock> UpdateStockAsync(int id, Stock newStock);
         Task<Stock> DeleteStockAsync(int id);
-        
+
+        //Task<Stock> UpdateStockPriceAsync(int id, double currentPrice, double highestPrice, double lowestPrice);
+        Task<Stock> UpdateStockPriceAsync(int id, double newPrice);
+
     }
     public class StockRepository : IStockRepository
     {
@@ -67,6 +70,51 @@ namespace Ledger.Ledger.Web.Repositories
             await _dbContext.SaveChangesAsync();
             return stock;
         }
+        /*public async Task<Stock> UpdateStockPriceAsync(int id, double currentPrice, double highestPrice, double lowestPrice) // updates the stock and returns that stock, returns null if there is no match 
+        {
+            var stock = await _dbContext.Stocks.FindAsync(id);
+            if (stock == null) return null;
+            
+            stock.CurrentPrice = currentPrice;
+            stock.HighestPrice = highestPrice;
+            stock.LowestPrice = lowestPrice;
+            await _dbContext.SaveChangesAsync();
+            return stock;
+        }*/
+        
+        public async Task<Stock> UpdateStockPriceAsync(int id, double newPrice) // updates the stock and returns that stock, returns null if there is no match 
+        {
+            var stock = await _dbContext.Stocks.FindAsync(id);
+            if (stock == null) return null;
+
+            if (newPrice < stock.LowestPrice) //update current and lowest price as newPrice
+            {
+                stock.CurrentPrice = newPrice;
+                stock.HighestPrice = stock.HighestPrice;
+                stock.LowestPrice = newPrice;
+                await _dbContext.SaveChangesAsync();
+                return stock;
+                
+            }
+            if (newPrice > stock.HighestPrice) //update current and high price as newPrice
+            {
+                stock.CurrentPrice = newPrice;
+                stock.HighestPrice = newPrice;
+                stock.LowestPrice = stock.LowestPrice;
+                await _dbContext.SaveChangesAsync();
+                return stock;
+                
+            }
+            //update only current price as newPrice
+            stock.CurrentPrice = newPrice;
+            stock.HighestPrice = stock.HighestPrice;
+            stock.LowestPrice = stock.LowestPrice;
+            await _dbContext.SaveChangesAsync();
+            return stock;
+        }
+        
+        
+        
         
     }
 }
