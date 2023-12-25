@@ -12,6 +12,7 @@ namespace Ledger.Ledger.Web.Data
         DbSet<BuyOrder> BuyOrders { get; set; }
         DbSet<SellOrder> SellOrders { get; set; }
         DbSet<Transaction> Transactions { get; set; }
+        DbSet<DailyStock> DailyStocks { get; set; }
         
         Task<int> SaveChangesAsync();
     }
@@ -32,6 +33,8 @@ namespace Ledger.Ledger.Web.Data
         public DbSet<BuyOrder> BuyOrders { get; set; }
         public DbSet<SellOrder> SellOrders { get; set; }
         public DbSet<Transaction> Transactions { get; set; }
+        
+        public DbSet<DailyStock> DailyStocks { get; set; }
         
         public async Task<int> SaveChangesAsync()
         {

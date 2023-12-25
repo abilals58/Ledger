@@ -30,6 +30,7 @@ namespace Ledger.Ledger.Web
             services.AddScoped<IBuyOrderRepository,BuyOrderRepository>();
             services.AddScoped<ISellOrderRepository, SellOrderRepository>();
             services.AddScoped<ITransactionRepository,TransactionRepository>();
+            services.AddScoped<IDailyStockRepository, DailyStockRepository>();
             
             // add interfaces and services for bussiness layer
             services.AddScoped<IUserService, UserService>();
