@@ -41,5 +41,15 @@ namespace Ledger.Ledger.Web.Data
             return await base.SaveChangesAsync();
         }
         
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            // Configure composite primary key for Dailystocks entity
+            modelBuilder.Entity<DailyStock>()
+                .HasKey(ds => new { ds.StockId, ds.Date });
+
+            // Additional configurations, if needed
+            base.OnModelCreating(modelBuilder);
+        }
+        
     }
 }

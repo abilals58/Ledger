@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Ledger.Ledger.Web.Models
 {
@@ -7,16 +8,20 @@ namespace Ledger.Ledger.Web.Models
     {
         [Key]
         public DateTime Date { get; set; }
+        [Key]
+        public int StockId { get; set; }
         public Double StockValue{ get; set; }
-
+        
+        
         public DailyStock()
         {
             
         }
 
-        public DailyStock(DateTime date, double stockValue)
+        public DailyStock(DateTime date, int stockId, double stockValue)
         {
             Date = date;
+            StockId = stockId;
             StockValue = stockValue;
         }
     }

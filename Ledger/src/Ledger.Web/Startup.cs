@@ -39,7 +39,8 @@ namespace Ledger.Ledger.Web
             services.AddScoped<IBuyOrderService, BuyOrderService>();
             services.AddScoped<ISellOrderService, SellOrderService>();
             services.AddScoped<ITransactionService, TransactionService>();
-            
+            services.AddScoped<IDailyStockService, DailyStockService>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
