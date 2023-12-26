@@ -37,6 +37,14 @@ namespace Ledger.Ledger.Web.Models
         LowestPrice = lowestPrice;
         Status = status;
     }
+
+    public override string ToString()
+    {
+        return $"StockId: {StockId}, StockName: {StockName}, OpenDate: {OpenDate}, " +
+               $"InitialStock: {InitialStock}, InitialPrice: {InitialPrice}, " +
+               $"CurrentStock: {CurrentStock}, CurrentPrice: {CurrentPrice}, " +
+               $"HighestPrice: {HighestPrice}, LowestPrice: {LowestPrice}, Status: {Status}";
+    }
     
     }
 }

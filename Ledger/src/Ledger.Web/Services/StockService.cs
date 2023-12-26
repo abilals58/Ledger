@@ -10,11 +10,10 @@ namespace Ledger.Ledger.Web.Services
     {
         Task<IEnumerable<Stock>> GetAllStocksAsync();
         Task<Stock> GetStockByIdAsync(int id);
-        Task AddStockAsync(Stock stock);
+        Task<Stock> AddStockAsync(Stock stock);
         Task<Stock> UpdateStockAsync(int id, Stock newStock);
         Task<Stock> DeleteStockAsync(int id);
         Task<List<List<object>>> RetrieveAllStockInfo();
-
         Task<Stock> UpdateAStockPrice(int id, double newPrice); // updates current, highest and lowest price values of a stock
     }
     public class StockService :IStockService
@@ -35,9 +34,9 @@ namespace Ledger.Ledger.Web.Services
             return await _stockRepository.GetStockByIdAsync(id);
         }
 
-        public async Task AddStockAsync(Stock stock)
+        public async Task<Stock> AddStockAsync(Stock stock)
         {
-            await _stockRepository.AddStockAsync(stock);        
+            return await _stockRepository.AddStockAsync(stock);        
         }
 
         public async Task<Stock> UpdateStockAsync(int id, Stock newStock)
