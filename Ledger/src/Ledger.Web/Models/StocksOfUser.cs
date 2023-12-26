@@ -7,8 +7,8 @@ namespace Ledger.Ledger.Web.Models
                               // related information about a user's stocks; therefore, it has fields StocksOfUserId (primary key), UserId and StockId (Foreign Keys) and NumOfStocks.
     {
         [Key]
-        public int? StocksOfUserId { get; set; } // randomly generated integer value
         public  int? UserId { get; set; }
+        [Key]
         public  int? StockId { get; set; }
         public  int NumOfStocks { get; set; }
         
@@ -23,12 +23,13 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public StocksOfUser(int stocksOfUserId, int userId, int stockId, int numOfStocks)
+        public StocksOfUser(int? userId, int? stockId, int numOfStocks, User user, Stock stock)
         {
-            StocksOfUserId = stocksOfUserId;
             UserId = userId;
             StockId = stockId;
             NumOfStocks = numOfStocks;
+            User = user;
+            Stock = stock;
         }
     }
 }

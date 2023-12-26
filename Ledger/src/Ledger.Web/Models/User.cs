@@ -13,12 +13,14 @@ namespace Ledger.Ledger.Web.Models
         public  string Email { set; get; }
         public  string Password { set; get; }
         public  string Phone { set; get; }
+        
+        public double Budget { set; get; }
 
         public User()
         {
         }
 
-        public User(int userId, string name, string surname, string userName, string email, string password, string phone)
+        public User(int? userId, string name, string surname, string userName, string email, string password, string phone, double budget)
         {
             UserId = userId;
             Name = name;
@@ -27,6 +29,7 @@ namespace Ledger.Ledger.Web.Models
             Email = email;
             Password = password;
             Phone = phone;
+            Budget = budget;
         }
     }
 }

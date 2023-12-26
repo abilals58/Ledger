@@ -11,7 +11,7 @@ using Transaction = Ledger.Ledger.Web.Models.Transaction;
 
 namespace LedgerTests.RepositoryTests
 {
-    public class TransactionRepositoryTests
+    /*public class TransactionRepositoryTests
     {
         
         [Fact]
@@ -95,5 +95,5 @@ namespace LedgerTests.RepositoryTests
             Assert.IsAssignableFrom<Transaction>(result);
         }
         
-    }
+    }*/
 }

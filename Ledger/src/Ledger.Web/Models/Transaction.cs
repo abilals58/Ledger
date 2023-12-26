@@ -40,5 +40,11 @@ namespace Ledger.Ledger.Web.Models
             Price = price;
             Date = date;
         }
+        
+        public override string ToString()
+        {
+            return $"Tid: {Tid}, SellerId: {SellerId}, BuyerId: {BuyerId}, StockId: {StockId}, StockNum: {StockNum}, " +
+                   $"Price: {Price}, Date: {Date}";
+        }
     }
 }

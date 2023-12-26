@@ -16,6 +16,8 @@ namespace Ledger.Ledger.Web.Models
         public  DateTime DateCreated { get; set; } = DateTime.Now;
         public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,sell order is active from startdate to enddate
         public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
+
+        public bool Status { get; set; } = true; //true: active false:deactive
         
         
         [ForeignKey("UserId")]
@@ -29,15 +31,23 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public SellOrder(int? sellOrderId, int? userId, int? stockId, double askPrice, int askSize, User user, Stock stock)
+        public SellOrder(int? sellOrderId, int? userId, int? stockId, double askPrice, int askSize, bool status, User user, Stock stock)
         {
             SellOrderId = sellOrderId;
             UserId = userId;
             StockId = stockId;
             AskPrice = askPrice;
             AskSize = askSize;
+            Status = status;
             User = user;
             Stock = stock;
         }
+
+        public override string ToString()
+        {
+            return $"SellOrderId: {SellOrderId}, UserId: {UserId}, StockId: {StockId}, AskPrice: {AskPrice}, AskSize: {AskSize}, " +
+                   $"DateCreated: {DateCreated}, StartDate: {StartDate}, EndDate: {EndDate}, Status: {Status}";
+        }
+
     }
 }

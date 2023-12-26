@@ -15,6 +15,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
         Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId);
+        Task<SellOrder> OperateSellOrderAsync(int id);
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
     {
@@ -78,6 +79,27 @@ namespace Ledger.Ledger.Web.Repositories
             var stockid = buyorder.StockId;
             var price = buyorder.BidPrice;
             return await _dbContext.SellOrders.Where(s => s.StockId == stockid && s.AskPrice == price).ToListAsync();
+        }
+
+        public async Task<SellOrder> OperateSellOrderAsync(int id)
+        {
+            //get related sellOrder object
+            var sellOrder = await _dbContext.SellOrders.FindAsync(id);
+            // change the stocksOfUser information accordingly
+            var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(sellOrder.UserId, sellOrder.StockId);
+            stocksOfUser.NumOfStocks -= sellOrder.AskSize;
+            
+            //change the user budget accordingly
+            var user = await _dbContext.Users.FindAsync(sellOrder.UserId);
+            user.Budget += sellOrder.AskSize * sellOrder.AskPrice;
+            
+            //update the sellOrder status
+            sellOrder.Status = false; //operation is done, logicaly deleted
+            
+            //saving the changes to database
+            await _dbContext.SaveChangesAsync();
+
+            return sellOrder;
         }
     }
 }

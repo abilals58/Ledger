@@ -17,6 +17,8 @@ namespace Ledger.Ledger.Web.Models
         public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,buy order is active from startdate to enddate
         public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
         
+        public bool Status { get; set; } = true; // ture: active, false: deactive
+        
         [ForeignKey("UserId")]
         public User User { get; set; } //navigation property
         
@@ -28,14 +30,22 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public BuyOrder(int buyOrderId, int userId, int stockId, double bidPrice, int bidSize, DateTime dateCreated)
+        public BuyOrder(int? buyOrderId, int? userId, int? stockId, double bidPrice, int bidSize, bool status, User user, Stock stock)
         {
             BuyOrderId = buyOrderId;
             UserId = userId;
             StockId = stockId;
             BidPrice = bidPrice;
             BidSize = bidSize;
-            DateCreated = dateCreated;
+            Status = status;
+            User = user;
+            Stock = stock;
+        }
+        
+        public override string ToString()
+        {
+            return $"BuyOrderId: {BuyOrderId}, UserId: {UserId}, StockId: {StockId}, BidPrice: {BidPrice}, BidSize: {BidSize}, " +
+                   $"DateCreated: {DateCreated}, StartDate: {StartDate}, EndDate: {EndDate}, Status: {Status}";
         }
     }
 }

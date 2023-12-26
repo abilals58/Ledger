@@ -46,6 +46,8 @@ namespace Ledger.Ledger.Web.Data
             // Configure composite primary key for Dailystocks entity
             modelBuilder.Entity<DailyStock>()
                 .HasKey(ds => new { ds.StockId, ds.Date });
+            modelBuilder.Entity<StocksOfUser>()
+                .HasKey(sou => new { sou.UserId, sou.StockId });
 
             // Additional configurations, if needed
             base.OnModelCreating(modelBuilder);

@@ -24,5 +24,10 @@ namespace Ledger.Ledger.Web.Models
             StockId = stockId;
             StockValue = stockValue;
         }
+        public override string ToString()
+        {
+            return $"Date: {Date}, StockId: {StockId}, StockValue: {StockValue}";
+        }
+        
     }
 }

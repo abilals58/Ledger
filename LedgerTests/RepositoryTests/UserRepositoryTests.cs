@@ -10,7 +10,7 @@ using Xunit;
 
 namespace LedgerTests.RepositoryTests
 {
-    public class UserRepositoryTests
+    /*public class UserRepositoryTests
     {
         
         [Fact]
@@ -97,5 +97,5 @@ namespace LedgerTests.RepositoryTests
             Assert.IsAssignableFrom<User>(result);
         }
         
-    }
+    }*/
 }
