@@ -20,33 +20,33 @@ namespace Ledger.Ledger.Web.Repositories
     public class TransactionRepository : ITransactionRepository // Transaction service corresponds to data tier and handles database operations
 
     {
-    private readonly IDbContext _dbContext;
+    private readonly DbSet<Transaction> _dbTransaction;
 
     public TransactionRepository(IDbContext dbContext)
     {
-        _dbContext = dbContext;
+        _dbTransaction = dbContext.Transactions;
     }
 
     public async Task<IEnumerable<Transaction>> GetAlTransactionsAsync() // returns all transactions
     {
-        return await _dbContext.Transactions.ToListAsync();
+        return await _dbTransaction.ToListAsync();
     }
 
     public async Task<Transaction> GetTransactionByIdAsync(int id) // returns a transaction by id
     {
-        return await _dbContext.Transactions.FindAsync(id);
+        return await _dbTransaction.FindAsync(id);
     }
 
     public async Task<Transaction> AddTransactionAsync(Transaction transaction) // adds a transaction to the database and returns the added transaction
     {
-        await _dbContext.Transactions.AddAsync(transaction);
-        await _dbContext.SaveChangesAsync();
+        await _dbTransaction.AddAsync(transaction);
+        //await _dbContext.SaveChangesAsync();
         return transaction;
     }
 
     public async Task<Transaction> UpdateTransactionAsync(int id, Transaction newtransaction) // updates a transaction and returns it, returns null if there is no match
     {
-        var transaction = await _dbContext.Transactions.FindAsync(id);
+        var transaction = await _dbTransaction.FindAsync(id);
         if (transaction == null) return null;
         transaction.SellerId = newtransaction.SellerId;
         transaction.BuyerId = newtransaction.BuyerId;
@@ -54,17 +54,17 @@ namespace Ledger.Ledger.Web.Repositories
         transaction.StockNum = newtransaction.StockNum;
         transaction.Price = newtransaction.Price;
         transaction.Date = newtransaction.Date;
-        await _dbContext.SaveChangesAsync();
+        //await _dbContext.SaveChangesAsync();
         return transaction;
     }
 
     public async Task<Transaction>
         DeleteTransactionAsync(int id) // delete transaction and returns it, returns null if there is no match
     {
-        var transaction = await _dbContext.Transactions.FindAsync(id);
+        var transaction = await _dbTransaction.FindAsync(id);
         if (transaction == null) return null;
-        _dbContext.Transactions.Remove(transaction);
-        await _dbContext.SaveChangesAsync();
+        _dbTransaction.Remove(transaction);
+       // await _dbContext.SaveChangesAsync();
         return transaction;
     }
     }

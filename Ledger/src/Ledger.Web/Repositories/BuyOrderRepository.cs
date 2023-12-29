@@ -13,40 +13,40 @@ namespace Ledger.Ledger.Web.Repositories
         Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder);
         Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder);
         Task<BuyOrder> DeleteBuyOrderAsync(int id);
-        Task<BuyOrder> OperateBuyOrderAsync(int id);
+        //Task<BuyOrder> OperateBuyOrderAsync(int id);
 
     }
     
     public class BuyOrderRepository : IBuyOrderRepository // BuyOrder service coresponds to data tier and handes database operations 
     {
-        private readonly IDbContext _dbContext;
+        private readonly DbSet<BuyOrder> _dbBuyOrder;
 
         public BuyOrderRepository(IDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbBuyOrder = dbContext.BuyOrders;
         }
 
         public async Task<IEnumerable<BuyOrder>> GetAllBuyOrdersAsync() // returns al buyorders
         {
-            return await _dbContext.BuyOrders.ToListAsync();
+            return await _dbBuyOrder.ToListAsync();
         }
 
         public async Task<BuyOrder> GetBuyOrderByIdAsync(int id) // returns a buyorder by id
         {
-            return await _dbContext.BuyOrders.FindAsync(id);
+            return await _dbBuyOrder.FindAsync(id);
 
         }
 
         public async Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder) // adds a buyorder to the database
         {
-            await _dbContext.BuyOrders.AddAsync(buyOrder);
-            await _dbContext.SaveChangesAsync();
+            await _dbBuyOrder.AddAsync(buyOrder);
+           // await _dbContext.SaveChangesAsync();
             return buyOrder;
         }
 
         public async Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder) // updates a buyorder an returns it, returns null if there is no match
         {
-            var buyOrder = await _dbContext.BuyOrders.FindAsync(id);
+            var buyOrder = await _dbBuyOrder.FindAsync(id);
             if (buyOrder == null) return null;
 
             buyOrder.UserId = newbuyOrder.UserId;
@@ -56,23 +56,23 @@ namespace Ledger.Ledger.Web.Repositories
             buyOrder.DateCreated = newbuyOrder.DateCreated;
             buyOrder.StartDate = newbuyOrder.StartDate;
             buyOrder.EndDate = newbuyOrder.EndDate;
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
             return buyOrder;
         }
 
         public async Task<BuyOrder> DeleteBuyOrderAsync(int id) // deletes a buyorder and returns it, returns null if there is no match
         {
-            var buyOrder = await _dbContext.BuyOrders.FindAsync(id);
+            var buyOrder = await _dbBuyOrder.FindAsync(id);
             if (buyOrder == null) return null;
-            _dbContext.BuyOrders.Remove(buyOrder);
-            await _dbContext.SaveChangesAsync();
+            _dbBuyOrder.Remove(buyOrder);
+            //await _dbContext.SaveChangesAsync();
             return buyOrder;
         }
         
-        public async Task<BuyOrder> OperateBuyOrderAsync(int id)
+        /*public async Task<BuyOrder> OperateBuyOrderAsync(int id)  bussiness layera taşınacak
         {
             //get related buyOrder object
-            var buyOrder = await _dbContext.BuyOrders.FindAsync(id);
+            var buyOrder = await _dbBuyOrder.FindAsync(id);
             // change the stocksOfUser information accordingly
             var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(buyOrder.UserId, buyOrder.StockId);
             stocksOfUser.NumOfStocks += buyOrder.BidSize;
@@ -88,6 +88,6 @@ namespace Ledger.Ledger.Web.Repositories
             await _dbContext.SaveChangesAsync();
 
             return buyOrder;
-        }
+        }*/
     }
 }

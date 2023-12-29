@@ -17,33 +17,33 @@ namespace Ledger.Ledger.Web.Repositories
     
     public class UserRepository :IUserRepository // User service corresponds to data access tier and handles database operations
     {
-        private readonly IDbContext _dbContext;
+        private readonly DbSet<User> _dbUser;
 
         public UserRepository(IDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbUser = dbContext.Users;
         }
         
         public async Task<IEnumerable<User>> GetAllUsersAsync() // returns all users 
         {
-            return await _dbContext.Users.ToListAsync();
+            return await _dbUser.ToListAsync();
         }
         
         public async Task<User> GetUserByIdAsync(int id) // returns a user by id, return null if there is no match
         {
-            return await _dbContext.Users.FindAsync(id);
+            return await _dbUser.FindAsync(id);
         }
         
         public async Task<User> AddUserAsync(User user) // ads new user 
         {
-            await _dbContext.Users.AddAsync(user);
-            await _dbContext.SaveChangesAsync();
+            await _dbUser.AddAsync(user);
+            //await _dbContext.SaveChangesAsync();
             return user;
         }
         
         public async Task<User> UpdateUserAsync(int id, User newUser) // updates a user and return that user, return null if there is no match
         {
-            var user = await _dbContext.Users.FindAsync(id);
+            var user = await _dbUser.FindAsync(id);
             if (user == null) return null;
             user.Name = newUser.Name;
             user.Surname = newUser.Surname;
@@ -51,16 +51,16 @@ namespace Ledger.Ledger.Web.Repositories
             user.Email = newUser.Email;
             user.Password = newUser.Password;
             user.Phone = newUser.Phone;
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
             return user;
         }
         
         public async Task<User> DeleteUserAsync(int id) // deletes a user, return null if there is no match
         {
-            var user = await _dbContext.Users.FindAsync(id);
+            var user = await _dbUser.FindAsync(id);
             if (user == null) return null;
-            _dbContext.Users.Remove(user);
-            await _dbContext.SaveChangesAsync();
+            _dbUser.Remove(user);
+            //await _dbContext.SaveChangesAsync();
 
             return user;
         }

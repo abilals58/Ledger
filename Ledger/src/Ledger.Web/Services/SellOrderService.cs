@@ -14,8 +14,8 @@ namespace Ledger.Ledger.Web.Services
         Task AddSellOrderAsync(SellOrder sellOrder);
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
-        Task<List<SellOrder>> MatchSellOrdersAsync(int buyOrderId, int bidSize); //returns a list of matched sellOrders
-        Task<SellOrder> OperateSellOrder(int id);
+        //Task<List<SellOrder>> MatchSellOrdersAsync(int buyOrderId, int bidSize); //returns a list of matched sellOrders
+        //Task<SellOrder> OperateSellOrder(int id);
 
     }
     public class SellOrderService :ISellOrderService
@@ -52,7 +52,7 @@ namespace Ledger.Ledger.Web.Services
         }
         
         //bussiness logic operations
-        public async Task<List<SellOrder>> MatchSellOrdersAsync(int buyOrderId, int bidSize)
+        /*public async Task<List<SellOrder>> MatchSellOrdersAsync(int buyOrderId, int bidSize)
         {
             
             // return all matched sellOrders according to bidId and price
@@ -76,6 +76,6 @@ namespace Ledger.Ledger.Web.Services
         public async Task<SellOrder> OperateSellOrder(int id)
         {
             return await _sellOrderRepository.OperateSellOrderAsync(id);
-        }
+        }*/
     }
 }

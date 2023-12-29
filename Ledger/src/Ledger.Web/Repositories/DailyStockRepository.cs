@@ -17,58 +17,57 @@ namespace Ledger.Ledger.Web.Repositories
         Task<DailyStock> UpdateDailyStockAsync(int id, DateTime date, DailyStock newdailystock);
         Task<DailyStock> DeleteDailyStockAsync(int id, DateTime date);
         Task<IEnumerable<DailyStock>> GetDailyStocksOfAStock(int id);
-
     }
     
     public class DailyStockRepository : IDailyStockRepository
     {
 
-        private readonly IDbContext _dbContext;
+        private readonly DbSet<DailyStock> _dbDailyStock;
         public DailyStockRepository(IDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbDailyStock = dbContext.DailyStocks;
         }
         
         public async Task<IEnumerable<DailyStock>> GetAllDailyStocksAsync()
         {
-            return await _dbContext.DailyStocks.ToListAsync();
+            return await _dbDailyStock.ToListAsync();
         }
 
         public async Task<DailyStock> GetDailyStockByDateAsync(int id, DateTime date)
         {
-            return await _dbContext.DailyStocks.FindAsync(id, date);
+            return await _dbDailyStock.FindAsync(id, date);
         }
 
         public async Task<DailyStock> AddDailyStockAsync(DailyStock dailystock)
         {
-            await _dbContext.DailyStocks.AddAsync(dailystock);
-            await _dbContext.SaveChangesAsync();
+            await _dbDailyStock.AddAsync(dailystock);
+            //await _dbContext.SaveChangesAsync();
             return dailystock;
         }
         
         public async Task<DailyStock> UpdateDailyStockAsync(int id, DateTime date, DailyStock newdailystock)
         {
-            var dailystock = await  _dbContext.DailyStocks.FindAsync(id, date);
+            var dailystock = await  _dbDailyStock.FindAsync(id, date);
             if (dailystock == null) return null;
             
             dailystock.StockValue = newdailystock.StockValue;
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
             return dailystock;
         }
 
         public async Task<DailyStock> DeleteDailyStockAsync(int id, DateTime date)
         {
-            var dailystock = await  _dbContext.DailyStocks.FindAsync(id, date );
+            var dailystock = await  _dbDailyStock.FindAsync(id, date );
             if (dailystock == null) return null;
 
-            _dbContext.DailyStocks.Remove(dailystock);
-            await _dbContext.SaveChangesAsync();
+            _dbDailyStock.Remove(dailystock);
+            //await _dbContext.SaveChangesAsync();
             return dailystock;
         }
 
         public async Task<IEnumerable<DailyStock>> GetDailyStocksOfAStock(int id)
         {
-            return await _dbContext.DailyStocks.Where(ds => ds.StockId == id).ToListAsync();
+            return await _dbDailyStock.Where(ds => ds.StockId == id).ToListAsync();
         }
     }
 }

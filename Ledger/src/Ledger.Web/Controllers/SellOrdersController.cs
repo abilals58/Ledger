@@ -72,7 +72,7 @@ namespace Ledger.Ledger.Web.Controllers
         }
         
         //BUSSINESS OPERATIONS
-        [HttpGet("{buyorderId}/{bidSize}")]
+        /*[HttpGet("{buyorderId}/{bidSize}")]
 
         public async Task<IActionResult> MatchedSellOrders(int buyorderId, int bidSize)
         {
@@ -83,6 +83,6 @@ namespace Ledger.Ledger.Web.Controllers
             }
 
             return Ok(new { Message = "Some matches are found!", MatchList = sellOrders });
-        }
+        }*/
     }
 }

@@ -14,39 +14,39 @@ namespace Ledger.Ledger.Web.Repositories
         Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder);
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
-        Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId);
-        Task<SellOrder> OperateSellOrderAsync(int id);
+        //Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId);
+        //Task<SellOrder> OperateSellOrderAsync(int id);
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
     {
-        private readonly IDbContext _dbContext;
+        private readonly DbSet<SellOrder> _dbSellOrder;
 
         public SellOrderRepository(IDbContext dbContext)
         {
-            _dbContext = dbContext;
+            _dbSellOrder = dbContext.SellOrders;
         }
         
         public async Task<IEnumerable<SellOrder>> GetAllSellOrdersAsync() // returns all sellorders
         {
-            return await _dbContext.SellOrders.ToListAsync();
+            return await _dbSellOrder.ToListAsync();
         }
         
         public async Task<SellOrder> GetSellOrderByIdAsync(int id) // returns a sellorder by id
         {
-            return await _dbContext.SellOrders.FindAsync(id);
+            return await _dbSellOrder.FindAsync(id);
             
         }
         
         public async Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder) // adds a sellorder to the database
         {
-            await _dbContext.SellOrders.AddAsync(sellOrder);
-            await _dbContext.SaveChangesAsync();
+            await _dbSellOrder.AddAsync(sellOrder);
+            //await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
         
         public async Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder) // updates a sellorder and returns it, returns null if there is no match
         {
-            var sellOrder = await _dbContext.SellOrders.FindAsync(id);
+            var sellOrder = await _dbSellOrder.FindAsync(id);
             if (sellOrder == null) return null;
             sellOrder.UserId = newSellOrder.UserId;
             sellOrder.StockId = newSellOrder.StockId;
@@ -55,20 +55,20 @@ namespace Ledger.Ledger.Web.Repositories
             sellOrder.DateCreated = newSellOrder.DateCreated;
             sellOrder.StartDate = newSellOrder.StartDate;
             sellOrder.EndDate = newSellOrder.EndDate;
-            await _dbContext.SaveChangesAsync();
+            //await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
         
         public async Task<SellOrder> DeleteSellOrderAsync(int id) // deletes a sellorder and returns it, returns null if there is no match
         {
-            var sellOrder = await _dbContext.SellOrders.FindAsync(id);
+            var sellOrder = await _dbSellOrder.FindAsync(id);
             if (sellOrder == null) return null;
-            _dbContext.SellOrders.Remove(sellOrder);
-            await _dbContext.SaveChangesAsync();
+            _dbSellOrder.Remove(sellOrder);
+            //await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
 
-        public async Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId)
+        /*public async Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId)
         {
             //find buyorder by given id
             var buyorder = await _dbContext.BuyOrders.FindAsync(buyorderId);
@@ -100,6 +100,6 @@ namespace Ledger.Ledger.Web.Repositories
             await _dbContext.SaveChangesAsync();
 
             return sellOrder;
-        }
+        }*/
     }
 }
