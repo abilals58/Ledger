@@ -17,21 +17,22 @@ namespace Ledger.Ledger.Web.Models
         public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,sell order is active from startdate to enddate
         public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
 
-        public bool Status { get; set; } = true; //true: active false:deactive
+        public bool Status { get; set; } = true; // ture: not deleted, false: deleted
+        public bool IsActive { get; set; } = true; // true: active, false: not active (out of working times)
         
         
-        [ForeignKey("UserId")]
-        public User User { get; set; } //navigation property
+        //[ForeignKey("UserId")]
+        //public User User { get; set; } //navigation property
         
-        [ForeignKey("StockId")]
-        public Stock Stock { get; set; }
+        //[ForeignKey("StockId")]
+        //public Stock Stock { get; set; }
 
         public SellOrder()
         {
             
         }
 
-        public SellOrder(int? sellOrderId, int? userId, int? stockId, double askPrice, int askSize, bool status, User user, Stock stock)
+        public SellOrder(int? sellOrderId, int? userId, int? stockId, double askPrice, int askSize, bool status, bool isActive)
         {
             SellOrderId = sellOrderId;
             UserId = userId;
@@ -39,8 +40,7 @@ namespace Ledger.Ledger.Web.Models
             AskPrice = askPrice;
             AskSize = askSize;
             Status = status;
-            User = user;
-            Stock = stock;
+            IsActive = isActive;
         }
 
         public override string ToString()

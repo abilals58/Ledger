@@ -1,3 +1,4 @@
+using System;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.Services;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Quartz;
 
 namespace Ledger.Ledger.Web
 {
@@ -14,9 +16,10 @@ namespace Ledger.Ledger.Web
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
+        [Obsolete("Obsolete")]
         public void ConfigureServices(IServiceCollection services)
         {
-            var pgString = "Host=localhost;Port=5432;Database=Ledger1;Username=postgres;Password=mysecretpassword;";
+            var pgString = "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
             // add dbcontext
             services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
@@ -44,6 +47,16 @@ namespace Ledger.Ledger.Web
             
             //add interface for unitofwork
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            
+            //add host schedular
+            services.AddQuartz(configure =>
+            {
+                configure.UseMicrosoftDependencyInjectionJobFactory();
+            });
+            services.AddQuartzHostedService(option =>
+            {
+                option.WaitForJobsToComplete = true;
+            });
 
         }
 

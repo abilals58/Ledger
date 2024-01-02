@@ -12,24 +12,22 @@ namespace Ledger.Ledger.Web.Models
         public  int? StockId { get; set; }
         public  int NumOfStocks { get; set; }
         
-        [ForeignKey("UserId")]
-        public User User { get; set; } //navigation property
+        //[ForeignKey("UserId")]
+        //public User User { get; set; } //navigation property
         
-        [ForeignKey("StockId")]
-        public Stock Stock { get; set; }
+        //[ForeignKey("StockId")]
+        //public Stock Stock { get; set; }
 
         public  StocksOfUser()
         {
             
         }
 
-        public StocksOfUser(int? userId, int? stockId, int numOfStocks, User user, Stock stock)
+        public StocksOfUser(int? userId, int? stockId, int numOfStocks)
         {
             UserId = userId;
             StockId = stockId;
             NumOfStocks = numOfStocks;
-            User = user;
-            Stock = stock;
         }
     }
 }

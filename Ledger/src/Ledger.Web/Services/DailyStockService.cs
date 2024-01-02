@@ -14,6 +14,7 @@ namespace Ledger.Ledger.Web.Services
         Task<DailyStock> AddDailyStockAsync(DailyStock dailystock);
         Task<DailyStock> UpdateDailyStockAsync(int id,DateTime date, DailyStock newdailystock);
         Task<DailyStock> DeleteDailyStockAsync(int id,DateTime date);
+        Task<IEnumerable<DailyStock>> RecordAllDailyStocksAsync();
 
         Task<IEnumerable<DailyStock>> GetDailyStocksOfAStock(int id);
     }
@@ -21,11 +22,13 @@ namespace Ledger.Ledger.Web.Services
     public class DailyStockService : IDailyStockService
     {
         private readonly IDailyStockRepository _dailyStockRepository;
+        private readonly IStockRepository _stockRepository;
         private IUnitOfWork _unitOfWork;
 
-        public DailyStockService(IDailyStockRepository dailyStockRepository, IUnitOfWork unitOfWork)
+        public DailyStockService(IDailyStockRepository dailyStockRepository, IStockRepository stockRepository,IUnitOfWork unitOfWork)
         {
             _dailyStockRepository = dailyStockRepository;
+            _stockRepository = stockRepository;
             _unitOfWork = unitOfWork;
         }
         
@@ -80,6 +83,32 @@ namespace Ledger.Ledger.Web.Services
                 var dailystock = await _dailyStockRepository.DeleteDailyStockAsync(id, date);
                 await _unitOfWork.CommitAsync();
                 return dailystock;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<DailyStock>> RecordAllDailyStocksAsync()
+        {
+            //get all the stocks
+            var stocks = await _stockRepository.GetAllStocksAsync();
+            
+            //for each stock record the current price as todays price
+            try
+            {
+                foreach (var stock in stocks)
+                {
+                    var date = DateTime.Today;
+                    await _dailyStockRepository.AddDailyStockAsync(new DailyStock(date, stock.StockId, stock.CurrentPrice));
+                }
+                //commit changes
+                await _unitOfWork.CommitAsync();
+                //return new version of daily stocks table
+                return await _dailyStockRepository.GetAllDailyStocksAsync();
             }
             catch (Exception e)
             {

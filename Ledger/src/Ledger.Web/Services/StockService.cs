@@ -115,21 +115,23 @@ namespace Ledger.Ledger.Web.Services
             try
             {
                 var stock = await _stockRepository.GetStockByIdAsync(id);
+                var updatedStock = new Stock();
                 if (stock == null) return null;
             
                 if (newPrice < stock.LowestPrice) //update lowest price and current price as newPrice
                 {
-                    return await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
+                    updatedStock =await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
                 }
 
-                if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
+                else if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
                 {
-                    return await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
+                     updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
                 }
-                // update only current price
-                var newStock = new Stock(stock.StockId, stock.StockName, stock.InitialStock, stock.InitialPrice,
-                    stock.CurrentStock, newPrice, stock.HighestPrice, stock.LowestPrice, stock.Status);
-                var updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
+                else{
+                    // update only current price
+                    updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
+                }
+                //commit changes 
                 await _unitOfWork.CommitAsync();
                 return updatedStock;
             }

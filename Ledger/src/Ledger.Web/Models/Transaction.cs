@@ -16,14 +16,14 @@ namespace Ledger.Ledger.Web.Models
         public  double Price { get; set; }
         public  DateTime Date { get; set; } = DateTime.Now;
 
-        [ForeignKey("SellerId")]
-        public User Seller { get; set; }
+        //[ForeignKey("SellerId")]
+        //public User Seller { get; set; }
         
-        [ForeignKey("BuyerId")]
-        public User Buyer { get; set; }
+        //[ForeignKey("BuyerId")]
+        //public User Buyer { get; set; }
         
-        [ForeignKey("StockId")]
-        public Stock Stock { get; set; }
+        //[ForeignKey("StockId")]
+        //public Stock Stock { get; set; }
         
         public Transaction()
         {
