@@ -38,7 +38,6 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<StocksOfUser> AddStocksOfUserAsync( StocksOfUser stocksOfUser) // add a stocksofuser
         {
             await _dbStocksOfUser.AddAsync(stocksOfUser);
-            //await _dbContext.SaveChangesAsync();
             return stocksOfUser;
         }
         
@@ -49,7 +48,6 @@ namespace Ledger.Ledger.Web.Repositories
             stocksOfUser.UserId = newStocksOfUser.UserId;
             stocksOfUser.StockId = newStocksOfUser.StockId;
             stocksOfUser.NumOfStocks = newStocksOfUser.NumOfStocks;
-            //await _dbContext.SaveChangesAsync();
             return stocksOfUser;
 
         }
@@ -59,7 +57,6 @@ namespace Ledger.Ledger.Web.Repositories
             var stocksOfUser = await _dbStocksOfUser.FindAsync(id);
             if (stocksOfUser == null) return null;
             _dbStocksOfUser.Remove(stocksOfUser);
-            //await _dbContext.SaveChangesAsync();
             return stocksOfUser;
         }
     }

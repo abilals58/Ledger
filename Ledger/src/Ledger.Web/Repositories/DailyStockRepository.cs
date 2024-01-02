@@ -41,7 +41,6 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<DailyStock> AddDailyStockAsync(DailyStock dailystock)
         {
             await _dbDailyStock.AddAsync(dailystock);
-            //await _dbContext.SaveChangesAsync();
             return dailystock;
         }
         
@@ -51,7 +50,6 @@ namespace Ledger.Ledger.Web.Repositories
             if (dailystock == null) return null;
             
             dailystock.StockValue = newdailystock.StockValue;
-            //await _dbContext.SaveChangesAsync();
             return dailystock;
         }
 
@@ -61,7 +59,6 @@ namespace Ledger.Ledger.Web.Repositories
             if (dailystock == null) return null;
 
             _dbDailyStock.Remove(dailystock);
-            //await _dbContext.SaveChangesAsync();
             return dailystock;
         }
 

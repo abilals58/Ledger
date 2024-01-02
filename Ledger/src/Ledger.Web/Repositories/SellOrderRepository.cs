@@ -40,7 +40,6 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder) // adds a sellorder to the database
         {
             await _dbSellOrder.AddAsync(sellOrder);
-            //await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
         
@@ -55,7 +54,6 @@ namespace Ledger.Ledger.Web.Repositories
             sellOrder.DateCreated = newSellOrder.DateCreated;
             sellOrder.StartDate = newSellOrder.StartDate;
             sellOrder.EndDate = newSellOrder.EndDate;
-            //await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
         
@@ -64,7 +62,6 @@ namespace Ledger.Ledger.Web.Repositories
             var sellOrder = await _dbSellOrder.FindAsync(id);
             if (sellOrder == null) return null;
             _dbSellOrder.Remove(sellOrder);
-            //await _dbContext.SaveChangesAsync();
             return sellOrder;
         }
 

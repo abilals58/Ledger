@@ -1,6 +1,7 @@
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.Services;
+using Ledger.Ledger.Web.UnitOfWork;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -15,11 +16,11 @@ namespace Ledger.Ledger.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            var pgString = "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;";
+            var pgString = "Host=localhost;Port=5432;Database=Ledger1;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
             // add dbcontext
-            //services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
-            services.AddDbContext<ApiDbContext>(option => option.UseInMemoryDatabase("Ledger"));
+            services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
+            //services.AddDbContext<ApiDbContext>(option => option.UseInMemoryDatabase("Ledger"));
             services.AddSwaggerGen(); // add swagger
             // add interfaces for dbcontext (connection to database, database layer)
             services.AddScoped<IDbContext,ApiDbContext>();
@@ -40,6 +41,9 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ISellOrderService, SellOrderService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IDailyStockService, DailyStockService>();
+            
+            //add interface for unitofwork
+            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
 
         }
 

@@ -40,7 +40,6 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder) // adds a buyorder to the database
         {
             await _dbBuyOrder.AddAsync(buyOrder);
-           // await _dbContext.SaveChangesAsync();
             return buyOrder;
         }
 
@@ -56,7 +55,6 @@ namespace Ledger.Ledger.Web.Repositories
             buyOrder.DateCreated = newbuyOrder.DateCreated;
             buyOrder.StartDate = newbuyOrder.StartDate;
             buyOrder.EndDate = newbuyOrder.EndDate;
-            //await _dbContext.SaveChangesAsync();
             return buyOrder;
         }
 
@@ -65,7 +63,6 @@ namespace Ledger.Ledger.Web.Repositories
             var buyOrder = await _dbBuyOrder.FindAsync(id);
             if (buyOrder == null) return null;
             _dbBuyOrder.Remove(buyOrder);
-            //await _dbContext.SaveChangesAsync();
             return buyOrder;
         }
         

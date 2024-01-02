@@ -37,7 +37,6 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<User> AddUserAsync(User user) // ads new user 
         {
             await _dbUser.AddAsync(user);
-            //await _dbContext.SaveChangesAsync();
             return user;
         }
         
@@ -51,7 +50,6 @@ namespace Ledger.Ledger.Web.Repositories
             user.Email = newUser.Email;
             user.Password = newUser.Password;
             user.Phone = newUser.Phone;
-            //await _dbContext.SaveChangesAsync();
             return user;
         }
         
@@ -60,8 +58,6 @@ namespace Ledger.Ledger.Web.Repositories
             var user = await _dbUser.FindAsync(id);
             if (user == null) return null;
             _dbUser.Remove(user);
-            //await _dbContext.SaveChangesAsync();
-
             return user;
         }
     }

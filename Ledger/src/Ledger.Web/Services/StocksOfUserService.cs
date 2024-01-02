@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
 using Ledger.Ledger.Web.Repositories;
+using Ledger.Ledger.Web.UnitOfWork;
 
 namespace Ledger.Ledger.Web.Services
 {
@@ -10,7 +12,7 @@ namespace Ledger.Ledger.Web.Services
     {
         Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync();
         Task<StocksOfUser> GetStocksOfUserByIdAsync(int id);
-        Task AddStocksOfUserAsync(StocksOfUser stocksOfUser);
+        Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser);
         Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser);
         Task<StocksOfUser> DeleteStocksOfUserAsync(int id);
     }
@@ -18,10 +20,12 @@ namespace Ledger.Ledger.Web.Services
     {
 
         private readonly IStocksOfUserRepository _stocksOfUserRepository;
+        private IUnitOfWork _unitOfWork;
 
-        public StocksOfUserService(IStocksOfUserRepository stocksOfUserRepository)
+        public StocksOfUserService(IStocksOfUserRepository stocksOfUserRepository, IUnitOfWork unitOfWork)
         {
             _stocksOfUserRepository = stocksOfUserRepository;
+            _unitOfWork = unitOfWork;
         }
         public async Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync()
         {
@@ -33,19 +37,54 @@ namespace Ledger.Ledger.Web.Services
             return await _stocksOfUserRepository.GetStocksOfUserByIdAsync(id);        
         }
 
-        public async Task AddStocksOfUserAsync(StocksOfUser stocksOfUser)
+        public async Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser)
         {
-            await _stocksOfUserRepository.AddStocksOfUserAsync(stocksOfUser);        
+            try
+            {
+                await _stocksOfUserRepository.AddStocksOfUserAsync(stocksOfUser);
+                await _unitOfWork.CommitAsync();
+                return stocksOfUser;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
+                  
         }
 
         public async Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser)
         {
-            return await _stocksOfUserRepository.UpdateStocksOfUserAsync(id, newStocksOfUser);        
+            try
+            {
+                var stocksOfUser = await _stocksOfUserRepository.UpdateStocksOfUserAsync(id, newStocksOfUser);
+                await _unitOfWork.CommitAsync();
+                return stocksOfUser;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
+                    
         }
 
         public async Task<StocksOfUser> DeleteStocksOfUserAsync(int id)
         {
-            return await _stocksOfUserRepository.DeleteStocksOfUserAsync(id);        
+            try
+            {
+                var stocksOfUser = await _stocksOfUserRepository.DeleteStocksOfUserAsync(id);
+                await _unitOfWork.CommitAsync();
+                return stocksOfUser;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
         }
     }
 }

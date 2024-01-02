@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
 using Ledger.Ledger.Web.Repositories;
+using Ledger.Ledger.Web.UnitOfWork;
 
 namespace Ledger.Ledger.Web.Services
 {
@@ -19,10 +21,12 @@ namespace Ledger.Ledger.Web.Services
     public class StockService :IStockService
     {
         private readonly IStockRepository _stockRepository;
+        private IUnitOfWork _unitOfWork;
 
-        public StockService(IStockRepository stockRepository)
+        public StockService(IStockRepository stockRepository, IUnitOfWork unitOfWork)
         {
             _stockRepository = stockRepository;
+            _unitOfWork = unitOfWork;
         }
         public async Task<IEnumerable<Stock>> GetAllStocksAsync()
         {
@@ -36,17 +40,50 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<Stock> AddStockAsync(Stock stock)
         {
-            return await _stockRepository.AddStockAsync(stock);        
+            try
+            {
+                 await _stockRepository.AddStockAsync(stock);
+                 await _unitOfWork.CommitAsync();
+                 return stock;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<Stock> UpdateStockAsync(int id, Stock newStock)
         {
-            return await _stockRepository.UpdateStockAsync(id, newStock);        
+            try
+            {
+                var stock =  await _stockRepository.UpdateStockAsync(id, newStock);
+                await _unitOfWork.CommitAsync();
+                return stock;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<Stock> DeleteStockAsync(int id)
         {
-            return await _stockRepository.DeleteStockAsync(id);        
+            try
+            {
+                var stock = await _stockRepository.DeleteStockAsync(id);
+                await _unitOfWork.CommitAsync();
+                return stock;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<List<List<object>>> RetrieveAllStockInfo()
@@ -75,22 +112,34 @@ namespace Ledger.Ledger.Web.Services
         
         public async Task<Stock> UpdateAStockPrice(int id,double newPrice)
         {
-            var stock = await _stockRepository.GetStockByIdAsync(id);
-            if (stock == null) return null;
+            try
+            {
+                var stock = await _stockRepository.GetStockByIdAsync(id);
+                if (stock == null) return null;
             
-            if (newPrice < stock.LowestPrice) //update lowest price and current price as newPrice
-            {
-                return await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
-            }
+                if (newPrice < stock.LowestPrice) //update lowest price and current price as newPrice
+                {
+                    return await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
+                }
 
-            if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
-            {
-                return await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
+                if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
+                {
+                    return await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
+                }
+                // update only current price
+                var newStock = new Stock(stock.StockId, stock.StockName, stock.InitialStock, stock.InitialPrice,
+                    stock.CurrentStock, newPrice, stock.HighestPrice, stock.LowestPrice, stock.Status);
+                var updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
+                await _unitOfWork.CommitAsync();
+                return updatedStock;
             }
-            // update only current price
-            var newStock = new Stock(stock.StockId, stock.StockName, stock.InitialStock, stock.InitialPrice,
-                stock.CurrentStock, newPrice, stock.HighestPrice, stock.LowestPrice, stock.Status);
-            return await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
+            
         }
     }
 }

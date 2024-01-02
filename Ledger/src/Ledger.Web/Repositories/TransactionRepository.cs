@@ -40,7 +40,6 @@ namespace Ledger.Ledger.Web.Repositories
     public async Task<Transaction> AddTransactionAsync(Transaction transaction) // adds a transaction to the database and returns the added transaction
     {
         await _dbTransaction.AddAsync(transaction);
-        //await _dbContext.SaveChangesAsync();
         return transaction;
     }
 
@@ -54,7 +53,6 @@ namespace Ledger.Ledger.Web.Repositories
         transaction.StockNum = newtransaction.StockNum;
         transaction.Price = newtransaction.Price;
         transaction.Date = newtransaction.Date;
-        //await _dbContext.SaveChangesAsync();
         return transaction;
     }
 
@@ -64,7 +62,6 @@ namespace Ledger.Ledger.Web.Repositories
         var transaction = await _dbTransaction.FindAsync(id);
         if (transaction == null) return null;
         _dbTransaction.Remove(transaction);
-       // await _dbContext.SaveChangesAsync();
         return transaction;
     }
     }

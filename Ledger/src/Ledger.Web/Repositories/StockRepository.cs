@@ -39,7 +39,6 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<Stock> AddStockAsync(Stock stock)  // adds a stock to the database
         {
             await _dbStock.AddAsync(stock);
-            //await _dbContext.SaveChangesAsync();
             return stock;
         }
         
@@ -56,7 +55,6 @@ namespace Ledger.Ledger.Web.Repositories
             stock.HighestPrice = newStock.HighestPrice;
             stock.LowestPrice = newStock.LowestPrice;
             stock.Status = newStock.Status;
-            //await _dbContext.SaveChangesAsync();
             return stock;
         }
         
@@ -65,7 +63,6 @@ namespace Ledger.Ledger.Web.Repositories
             var stock = await _dbStock.FindAsync(id);
             if (stock == null) return null;
             _dbStock.Remove(stock);
-            //await _dbContext.SaveChangesAsync();
             return stock;
         }
         public async Task<Stock> UpdateStockPriceAsync(int id, double currentPrice, double highestPrice, double lowestPrice) // updates the stock and returns that stock, returns null if there is no match 
@@ -76,7 +73,6 @@ namespace Ledger.Ledger.Web.Repositories
             stock.CurrentPrice = currentPrice;
             stock.HighestPrice = highestPrice;
             stock.LowestPrice = lowestPrice;
-            //await _dbContext.SaveChangesAsync();
             return stock;
         }
     }
