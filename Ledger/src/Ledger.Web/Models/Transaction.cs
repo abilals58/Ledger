@@ -8,10 +8,10 @@ namespace Ledger.Ledger.Web.Models
                             // It has fields Tid (Primary key), SellerId, BuyerId, StockId (Foreign Keys), Price and Date.
     {
         [Key]
-        public  int? Tid { get; set; }
-        public  int? SellerId { get; set; }
-        public  int? BuyerId { get; set; }
-        public  int? StockId { get; set; }
+        public  int Tid { get; set; }
+        public  int SellerId { get; set; }
+        public  int BuyerId { get; set; }
+        public  int StockId { get; set; }
         public  int StockNum { get; set; }
         public  double Price { get; set; }
         public  DateTime Date { get; set; } = DateTime.Now;

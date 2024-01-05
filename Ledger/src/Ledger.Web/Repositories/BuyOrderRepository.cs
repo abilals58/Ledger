@@ -14,6 +14,8 @@ namespace Ledger.Ledger.Web.Repositories
         Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder);
         Task<BuyOrder> DeleteBuyOrderAsync(int id);
         //Task<BuyOrder> OperateBuyOrderAsync(int id);
+        Task UpdateBidSize(int id, int size); //decrement the bidSize by given size
+        Task LogicalDelete(int id); // change the status of buyOrder false (deleted)
 
     }
     
@@ -65,7 +67,19 @@ namespace Ledger.Ledger.Web.Repositories
             _dbBuyOrder.Remove(buyOrder);
             return buyOrder;
         }
+
+        public async Task UpdateBidSize(int id, int size)
+        {
+            var buyOrder = await _dbBuyOrder.FindAsync(id);
+            buyOrder.BidSize -= size;
+        }
         
+        public async Task LogicalDelete(int id) //changes the status to deleted (no)
+        {
+            var buyOrder = await _dbBuyOrder.FindAsync(id);
+            buyOrder.Status = false;
+        }
+
         /*public async Task<BuyOrder> OperateBuyOrderAsync(int id)  bussiness layera taşınacak
         {
             //get related buyOrder object

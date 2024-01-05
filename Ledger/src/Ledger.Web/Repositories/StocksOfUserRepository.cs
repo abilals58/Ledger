@@ -14,6 +14,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser);
         Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser);
         Task<StocksOfUser> DeleteStocksOfUserAsync(int id);
+        Task<StocksOfUser> UpdateStockInfo(int userId, int stockId, char sign, int size); //update stock size information according to the sign and size
     }
     public class StocksOfUserRepository : IStocksOfUserRepository// StocksOfUser service corresponds to data access tier and handles database operations
     {
@@ -58,6 +59,25 @@ namespace Ledger.Ledger.Web.Repositories
             if (stocksOfUser == null) return null;
             _dbStocksOfUser.Remove(stocksOfUser);
             return stocksOfUser;
+        }
+
+        public async Task<StocksOfUser> UpdateStockInfo(int userId, int stockId, char sign, int size)
+        {
+            var stocksOfUser = await _dbStocksOfUser.FindAsync(userId, stockId);
+            if (stocksOfUser == null) return null;
+            //update size information accordingly
+
+            if (sign == '+')
+            {
+                stocksOfUser.NumOfStocks += size;
+            }
+            else
+            {
+                stocksOfUser.NumOfStocks -= size;
+            }
+
+            return stocksOfUser;
+
         }
     }
 }

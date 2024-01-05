@@ -13,6 +13,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task<User> AddUserAsync(User user);
         Task<User> UpdateUserAsync(int id, User newUser);
         Task<User> DeleteUserAsync(int id);
+        Task<User> UpdateBudget(int? id, char sign, double amount);
     }
     
     public class UserRepository :IUserRepository // User service corresponds to data access tier and handles database operations
@@ -58,6 +59,21 @@ namespace Ledger.Ledger.Web.Repositories
             var user = await _dbUser.FindAsync(id);
             if (user == null) return null;
             _dbUser.Remove(user);
+            return user;
+        }
+
+        public async Task<User> UpdateBudget(int? id, char sign, double amount)
+        {
+            var user = await _dbUser.FindAsync(id);
+            if (sign == '+')
+            {
+                user.Budget += amount;
+            }
+            else
+            {
+                user.Budget -= amount;
+            }
+
             return user;
         }
     }

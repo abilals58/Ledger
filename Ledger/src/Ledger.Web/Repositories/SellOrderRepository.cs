@@ -14,6 +14,9 @@ namespace Ledger.Ledger.Web.Repositories
         Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder);
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
+        Task UpdateAskSizeAsync(int id, int size);
+
+        Task LogicalDelete(int id);
         //Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId);
         //Task<SellOrder> OperateSellOrderAsync(int id);
     }
@@ -63,6 +66,18 @@ namespace Ledger.Ledger.Web.Repositories
             if (sellOrder == null) return null;
             _dbSellOrder.Remove(sellOrder);
             return sellOrder;
+        }
+
+        public async Task UpdateAskSizeAsync(int id, int size) //decrements the askSize by given size
+        {
+            var sellOrder = await _dbSellOrder.FindAsync(id);
+            sellOrder.AskSize -= size;
+        }
+
+        public async Task LogicalDelete(int id) //changes the status to deleted (no)
+        {
+            var sellOrder = await _dbSellOrder.FindAsync(id);
+            sellOrder.Status = false;
         }
 
         /*public async Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId)

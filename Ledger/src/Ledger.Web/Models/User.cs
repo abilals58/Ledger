@@ -6,7 +6,7 @@ namespace Ledger.Ledger.Web.Models
                       // Surname, Username, Email, Password, Phone fields.
     {
         [Key]
-        public  int? UserId { set; get; } // a randomly generated integer 
+        public  int UserId { set; get; } // a randomly generated integer 
         public  string Name { set; get; }
         public  string Surname { set; get; }
         public  string UserName { set; get; }
@@ -20,7 +20,7 @@ namespace Ledger.Ledger.Web.Models
         {
         }
 
-        public User(int? userId, string name, string surname, string userName, string email, string password, string phone, double budget)
+        public User(int userId, string name, string surname, string userName, string email, string password, string phone, double budget)
         {
             UserId = userId;
             Name = name;

@@ -7,9 +7,9 @@ namespace Ledger.Ledger.Web.Models
                               // related information about a user's stocks; therefore, it has fields StocksOfUserId (primary key), UserId and StockId (Foreign Keys) and NumOfStocks.
     {
         [Key]
-        public  int? UserId { get; set; }
+        public  int UserId { get; set; }
         [Key]
-        public  int? StockId { get; set; }
+        public  int StockId { get; set; }
         public  int NumOfStocks { get; set; }
         
         //[ForeignKey("UserId")]
@@ -23,7 +23,7 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public StocksOfUser(int? userId, int? stockId, int numOfStocks)
+        public StocksOfUser(int userId, int stockId, int numOfStocks)
         {
             UserId = userId;
             StockId = stockId;

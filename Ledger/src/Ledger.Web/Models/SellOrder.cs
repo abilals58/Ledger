@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -8,9 +9,9 @@ namespace Ledger.Ledger.Web.Models
                            // UserId and StockId (Foreign Keys), AskPrice, AskSize, DateCreated fields.
     {
         [Key]
-        public int? SellOrderId { get; set; } // randomly generated integer
-        public  int? UserId { get; set; }
-        public  int? StockId { get; set; }
+        public int SellOrderId { get; set; } // randomly generated integer
+        public  int UserId { get; set; }
+        public  int StockId { get; set; }
         public  double AskPrice { get; set; }
         public  int AskSize { get; set; }
         public  DateTime DateCreated { get; set; } = DateTime.Now;
@@ -18,7 +19,11 @@ namespace Ledger.Ledger.Web.Models
         public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
 
         public bool Status { get; set; } = true; // ture: not deleted, false: deleted
-        public bool IsActive { get; set; } = true; // true: active, false: not active (out of working times)
+
+        public List<BuyOrder> MatchList { get; set; } = new List<BuyOrder>();
+
+        public bool IsMatched { get; set; } = false;
+        //public bool IsActive { get; set; } = true; // true: active, false: not active (out of working times)
         
         
         //[ForeignKey("UserId")]
@@ -32,7 +37,7 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public SellOrder(int? sellOrderId, int? userId, int? stockId, double askPrice, int askSize, bool status, bool isActive)
+        public SellOrder(int sellOrderId, int userId, int stockId, double askPrice, int askSize, bool status, bool isMatched)
         {
             SellOrderId = sellOrderId;
             UserId = userId;
@@ -40,7 +45,7 @@ namespace Ledger.Ledger.Web.Models
             AskPrice = askPrice;
             AskSize = askSize;
             Status = status;
-            IsActive = isActive;
+            IsMatched = isMatched;
         }
 
         public override string ToString()
