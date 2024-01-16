@@ -11,7 +11,7 @@ namespace Ledger.Ledger.Web.Services
     public interface IStocksOfUserService
     {
         Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync();
-        Task<StocksOfUser> GetStocksOfUserByIdAsync(int id);
+        Task<StocksOfUser> GetAStocksOfUserAsync(int userId, int stockId);
         Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser);
         Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser);
         Task<StocksOfUser> DeleteStocksOfUserAsync(int id);
@@ -32,9 +32,9 @@ namespace Ledger.Ledger.Web.Services
             return await _stocksOfUserRepository.GetAllStocksOfUserAsync();
         }
 
-        public async Task<StocksOfUser> GetStocksOfUserByIdAsync(int id)
+        public async Task<StocksOfUser> GetAStocksOfUserAsync(int userId, int stockId)
         {
-            return await _stocksOfUserRepository.GetStocksOfUserByIdAsync(id);        
+            return await _stocksOfUserRepository.GetAStocksOfUserAsync(userId, stockId);        
         }
 
         public async Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser)

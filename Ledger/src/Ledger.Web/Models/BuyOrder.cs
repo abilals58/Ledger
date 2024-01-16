@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Newtonsoft.Json;
 
 namespace Ledger.Ledger.Web.Models
 {
@@ -20,7 +21,8 @@ namespace Ledger.Ledger.Web.Models
         
         public bool Status { get; set; } = true; // ture: not deleted, false: deleted
         //public bool IsActive { get; set; } = true; // true: active, false: not active (out of working times)
-        public List<SellOrder> MatchList { get; set; } = new List<SellOrder>();
+        
+        //public List<SellOrder> MatchList { get; set; } = new();
         
         
         //[ForeignKey("UserId")]

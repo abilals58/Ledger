@@ -14,6 +14,8 @@ namespace Ledger.Ledger.Web.Data
         DbSet<SellOrder> SellOrders { get; set; }
         DbSet<Transaction> Transactions { get; set; }
         DbSet<DailyStock> DailyStocks { get; set; }
+        
+        DbSet<SellOrderMatch> SellOrderMatches { get; set; }
 
         IDbContextTransaction BeginTransaction();
         Task<int> SaveChangesAsync();
@@ -35,6 +37,7 @@ namespace Ledger.Ledger.Web.Data
         public DbSet<Transaction> Transactions { get; set; }
 
         public DbSet<DailyStock> DailyStocks { get; set; }
+        public DbSet<SellOrderMatch> SellOrderMatches { get; set; }
 
         public IDbContextTransaction BeginTransaction()
         {
@@ -53,6 +56,8 @@ namespace Ledger.Ledger.Web.Data
                 .HasKey(ds => new { ds.StockId, ds.Date });
             modelBuilder.Entity<StocksOfUser>()
                 .HasKey(sou => new { sou.UserId, sou.StockId });
+            modelBuilder.Entity<SellOrderMatch>()
+                .HasKey(som => new { som.SellOrderId, som.BuyOrderId });
 
             // Additional configurations, if needed
             base.OnModelCreating(modelBuilder);

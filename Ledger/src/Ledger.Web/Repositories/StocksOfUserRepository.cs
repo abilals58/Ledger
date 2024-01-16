@@ -10,7 +10,7 @@ namespace Ledger.Ledger.Web.Repositories
     public interface IStocksOfUserRepository
     {
         Task<IEnumerable<StocksOfUser>> GetAllStocksOfUserAsync();
-        Task<StocksOfUser> GetStocksOfUserByIdAsync(int id);
+        Task<StocksOfUser> GetAStocksOfUserAsync(int userId, int stockId);
         Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser);
         Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser);
         Task<StocksOfUser> DeleteStocksOfUserAsync(int id);
@@ -30,9 +30,9 @@ namespace Ledger.Ledger.Web.Repositories
             return await _dbStocksOfUser.ToListAsync();
         }
         
-        public async Task<StocksOfUser> GetStocksOfUserByIdAsync(int id) // returns a stocksofuser by id
+        public async Task<StocksOfUser> GetAStocksOfUserAsync(int userId, int stockId) // returns a stocksofuser by id
         {
-            return await _dbStocksOfUser.FindAsync(id);
+            return await _dbStocksOfUser.FindAsync(userId, stockId);
            
         }
 
@@ -69,11 +69,11 @@ namespace Ledger.Ledger.Web.Repositories
 
             if (sign == '+')
             {
-                stocksOfUser.NumOfStocks += size;
+                stocksOfUser.NumOfStocks = stocksOfUser.NumOfStocks + size;
             }
             else
             {
-                stocksOfUser.NumOfStocks -= size;
+                stocksOfUser.NumOfStocks = stocksOfUser.NumOfStocks - size;
             }
 
             return stocksOfUser;

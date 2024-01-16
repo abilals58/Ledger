@@ -19,12 +19,18 @@ namespace Ledger.Ledger.Web.Controllers
         //CRUD OPERATIONS
         
         // GET: api/sellorders
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("GetMatchOrder")]
+        public async Task<IActionResult> GetMatchOrder()
         {
-            return Ok(await _sellOrderService.GetAllSellOrdersAsync());
+            return Ok(await _sellOrderService.MatchSellOrdersAsync(10));
         }
-
+        
+        [HttpGet("GetTradeOpr")]
+        public async Task<IActionResult> GetTradeOperation()
+        {
+            return Ok(await _sellOrderService.OperateTradeAsync(10));
+        }
+        
         // GET: api/sellorders/id
         [HttpGet("{id}", Name = "GetSellOrder")]
         public async Task<IActionResult> Get(int id)
@@ -70,6 +76,17 @@ namespace Ledger.Ledger.Web.Controllers
             
             return Ok(new {Message = "SellOrder with given id deleted successfuly!", SellOrder = sellOrder});
         }
+        
+        // GET: api/sellorders
+        [HttpGet()]
+        public async Task<IActionResult> Get()
+        {
+            return Ok(await _sellOrderService.GetAllSellOrdersAsync());
+        }
+        
+        
+        
+        
         
         //BUSSINESS OPERATIONS
         /*[HttpGet("{buyorderId}/{bidSize}")]

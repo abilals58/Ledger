@@ -1,5 +1,6 @@
 using System;
 using Ledger.Ledger.Web.Data;
+using Ledger.Ledger.Web.Jobs;
 using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.Services;
 using Ledger.Ledger.Web.UnitOfWork;
@@ -19,7 +20,7 @@ namespace Ledger.Ledger.Web
         [Obsolete("Obsolete")]
         public void ConfigureServices(IServiceCollection services)
         {
-            var pgString = "Host=localhost;Port=5432;Database=Ledger;Username=postgres;Password=mysecretpassword;";
+            var pgString = "Host=localhost;Port=5432;Database=Ledger1;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
             // add dbcontext
             services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
@@ -35,6 +36,7 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ISellOrderRepository, SellOrderRepository>();
             services.AddScoped<ITransactionRepository,TransactionRepository>();
             services.AddScoped<IDailyStockRepository, DailyStockRepository>();
+            services.AddScoped<ISellOrderMatchRepository, SellOrderMatchRepository>();
             
             // add interfaces and services for bussiness layer
             services.AddScoped<IUserService, UserService>();
@@ -44,11 +46,15 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ISellOrderService, SellOrderService>();
             services.AddScoped<ITransactionService, TransactionService>();
             services.AddScoped<IDailyStockService, DailyStockService>();
+            services.AddScoped<ISellOrderMatchService, SellOrderMatchService>();
+            //services.AddScoped<IScheduler, SchedulerService>();
             
             //add interface for unitofwork
             services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
-            
-            //add host schedular
+
+            services.AddScoped<TradeJob>();
+
+            /*//add host scheduler
             services.AddQuartz(configure =>
             {
                 configure.UseMicrosoftDependencyInjectionJobFactory();
@@ -56,8 +62,7 @@ namespace Ledger.Ledger.Web
             services.AddQuartzHostedService(option =>
             {
                 option.WaitForJobsToComplete = true;
-            });
-
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

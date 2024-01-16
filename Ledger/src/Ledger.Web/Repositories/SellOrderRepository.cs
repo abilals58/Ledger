@@ -71,13 +71,13 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task UpdateAskSizeAsync(int id, int size) //decrements the askSize by given size
         {
             var sellOrder = await _dbSellOrder.FindAsync(id);
-            sellOrder.AskSize -= size;
+            sellOrder.AskSize = sellOrder.AskSize - size;
         }
 
         public async Task LogicalDelete(int id) //changes the status to deleted (no)
         {
             var sellOrder = await _dbSellOrder.FindAsync(id);
-            sellOrder.Status = false;
+            sellOrder.Status = OrderStatus.CompletedAndDeleted;
         }
 
         /*public async Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId)

@@ -25,10 +25,10 @@ namespace Ledger.Ledger.Web.Controllers
         }
 
         // GET: api/stocksofusers/id
-        [HttpGet("{id}", Name = "GetStocksOfUser")]
-        public async Task<IActionResult> Get(int id)
+        [HttpGet("{userId}/{stockId}", Name = "GetStocksOfUser")]
+        public async Task<IActionResult> Get(int userId, int stockId)
         {
-            var stocksOfUser = await _stocksOfUserService.GetStocksOfUserByIdAsync(id);
+            var stocksOfUser = await _stocksOfUserService.GetAStocksOfUserAsync(userId, stockId);
             if (stocksOfUser == null)
             {
                 return NotFound("StocksOfUsers with given id does not exist in the database! ");

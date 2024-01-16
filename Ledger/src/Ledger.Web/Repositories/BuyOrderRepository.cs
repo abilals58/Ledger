@@ -71,7 +71,7 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task UpdateBidSize(int id, int size)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(id);
-            buyOrder.BidSize -= size;
+            buyOrder.BidSize = buyOrder.BidSize - size;
         }
         
         public async Task LogicalDelete(int id) //changes the status to deleted (no)
