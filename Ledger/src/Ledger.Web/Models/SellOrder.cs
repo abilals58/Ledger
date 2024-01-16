@@ -10,7 +10,7 @@ namespace Ledger.Ledger.Web.Models
     public enum OrderStatus{
         [Description("Active")]
         Active=1,
-        [Description("Patially completed and active")]
+        [Description("Partially completed and active")]
         PartiallyCompletedAndActive=2,
         [Description("Not Active, will activated on the beginning of the next day")]
         NotYetActive = 3,

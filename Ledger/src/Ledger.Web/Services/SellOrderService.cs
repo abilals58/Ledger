@@ -140,11 +140,6 @@ namespace Ledger.Ledger.Web.Services
                     }
                 }
 
-                if (totalSize != 0)
-                {
-                    sellOrder.IsMatched = true; //partial match kısmını düşün !!!
-                }
-
                 await _unitOfWork.CommitAsync();
                 return sellOrder;
             }
@@ -159,19 +154,6 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<SellOrder> OperateTradeAsync(int sellOrderId) //operate trade, form transactions
         {
-            // first phase --match
-            /*try
-            {
-                await this.MatchSellOrdersAsync(sellOrderId);
-                await _unitOfWork.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }*/
-            //second phase --operate
             try
             {
                 //get related sellOrder
@@ -190,10 +172,12 @@ namespace Ledger.Ledger.Web.Services
                         if (sellOrder.AskSize < buyOrder.BidSize) //lowest one determines 
                         {
                             size = sellOrder.AskSize;
+                            
                         }
                         else
                         {
                             size = buyOrder.BidSize;
+                            sellOrder.Status = OrderStatus.PartiallyCompletedAndActive; //partially completed
                         }
                         //operate the trade between matched sellOrder and buyOrder
                         //update sellOrder related information

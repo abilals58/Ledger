@@ -20,7 +20,22 @@ namespace Ledger.Ledger.Web
         [Obsolete("Obsolete")]
         public void ConfigureServices(IServiceCollection services)
         {
-            var pgString = "Host=localhost;Port=5432;Database=Ledger1;Username=postgres;Password=mysecretpassword;";
+            
+            services.AddQuartz(q =>
+            {
+                // base Quartz scheduler, job and trigger configuration
+            });
+
+            // ASP.NET Core hosting
+            services.AddQuartzHostedService(options =>
+            {
+                // when shutting down we want jobs to complete gracefully
+                options.WaitForJobsToComplete = true;
+            });
+            
+            
+            
+            var pgString = "Host=localhost;Port=5432;Database=Ledger2;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
             // add dbcontext
             services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
@@ -89,6 +104,7 @@ namespace Ledger.Ledger.Web
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ledger API V1");
                 c.RoutePrefix = string.Empty;
             });
+            
         }
     }
 }

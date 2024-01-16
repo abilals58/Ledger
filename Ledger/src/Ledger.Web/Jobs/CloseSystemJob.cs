@@ -19,6 +19,12 @@ namespace Ledger.Ledger.Web.Jobs
         {
             //record the ending values of all stocks
             await _dailyStockService.RecordAllDailyStocksAsync();
+            
+            // if status is partially completed and active --> partially completed and deleted
+            // if status is active --> not completed and deleted
+            
+            
+            
         }
     }
 }
