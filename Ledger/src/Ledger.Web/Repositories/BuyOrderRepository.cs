@@ -54,9 +54,7 @@ namespace Ledger.Ledger.Web.Repositories
             buyOrder.StockId = newbuyOrder.StockId;
             buyOrder.BidPrice = newbuyOrder.BidSize;
             buyOrder.BidSize = newbuyOrder.BidSize;
-            buyOrder.DateCreated = newbuyOrder.DateCreated;
             buyOrder.StartDate = newbuyOrder.StartDate;
-            buyOrder.EndDate = newbuyOrder.EndDate;
             return buyOrder;
         }
 
@@ -71,34 +69,13 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task UpdateBidSize(int id, int size)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(id);
-            buyOrder.BidSize = buyOrder.BidSize - size;
+            buyOrder.CurrentBidSize = buyOrder.CurrentBidSize - size;
         }
         
         public async Task LogicalDelete(int id) //changes the status to deleted (no)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(id);
-            buyOrder.Status = false;
+            buyOrder.Status = OrderStatus.CompletedAndDeleted;
         }
-
-        /*public async Task<BuyOrder> OperateBuyOrderAsync(int id)  bussiness layera taşınacak
-        {
-            //get related buyOrder object
-            var buyOrder = await _dbBuyOrder.FindAsync(id);
-            // change the stocksOfUser information accordingly
-            var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(buyOrder.UserId, buyOrder.StockId);
-            stocksOfUser.NumOfStocks += buyOrder.BidSize;
-            
-            //change the user budget accordingly
-            var user = await _dbContext.Users.FindAsync(buyOrder.UserId);
-            user.Budget -= buyOrder.BidSize * buyOrder.BidPrice;
-            
-            //update the buyOrder status
-            buyOrder.Status = false; //operation is done, logicaly deleted
-            
-            //saving the changes to database
-            await _dbContext.SaveChangesAsync();
-
-            return buyOrder;
-        }*/
     }
 }

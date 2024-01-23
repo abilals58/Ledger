@@ -1,4 +1,4 @@
-using System;
+/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +12,7 @@ using Xunit.Abstractions;
 
 namespace LedgerTests.ControllerTests
 {
-    /*public class UserControllerTests
+    public class UserControllerTests
     {
         [Fact]
         public async Task GetAllUsers_ShouldReturnListOfUsers() // return type check unit result
@@ -155,5 +155,5 @@ namespace LedgerTests.ControllerTests
             
         }
         
-    }*/
-}
+    }
+}*/

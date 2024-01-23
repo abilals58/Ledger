@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+/*using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
@@ -8,7 +8,7 @@ using Xunit;
 
 namespace LedgerTests.RepositoryTests
 {
-    /*public class SellOrderRepositoryTests
+    public class SellOrderRepositoryTests
     {
         [Fact]
         public async Task GetAllSellOrdersAsync_ShouldReturnAllSellOrders()
@@ -90,5 +90,5 @@ namespace LedgerTests.RepositoryTests
             // Assert
             Assert.IsAssignableFrom<SellOrder>(result);
         }
-    }*/
-}
+    }
+}*/

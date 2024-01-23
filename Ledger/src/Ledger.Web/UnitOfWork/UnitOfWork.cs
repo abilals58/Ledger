@@ -28,7 +28,6 @@ namespace Ledger.Ledger.Web.UnitOfWork
         {
             await _dbContext.SaveChangesAsync();
             await _transaction.CommitAsync();
-
         }
         public async Task RollBackAsync()
         {

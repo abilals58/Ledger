@@ -24,6 +24,7 @@ namespace Ledger.Ledger.Web.Services
         Task<BuyOrder> OperateBuyOrderAsync(int buyOrderId, int size);
 
         Task<int> GetLatestSellOrderId();
+        Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId); // returns transactions related to a sellOrder
 
     }
     public class SellOrderService :ISellOrderService
@@ -126,14 +127,14 @@ namespace Ledger.Ledger.Web.Services
                 foreach (var buyOrder in buyOrders)
                 {
                     //check for the stockId and price and deleted --status:false/not deleted --status:true
-                    if (buyOrder.Status != false && sellOrder.StockId == buyOrder.StockId &&
+                    if ((buyOrder.Status == OrderStatus.Active || buyOrder.Status == OrderStatus.PartiallyCompletedAndActive) && sellOrder.StockId == buyOrder.StockId &&
                         sellOrder.AskPrice == buyOrder.BidPrice)
                     {
                         // add  new match record to the sellOrderMatchs
                         await _sellOrderMatchRepository.AddSellOrderMatchAsync(sellOrderId, buyOrder.BuyOrderId);
-                        totalSize = totalSize + buyOrder.BidSize;
+                        totalSize = totalSize + buyOrder.CurrentBidSize;
 
-                        if (totalSize >= sellOrder.AskSize)
+                        if (totalSize >= sellOrder.CurrentAskSize)
                         {
                             break;
                         }
@@ -165,28 +166,29 @@ namespace Ledger.Ledger.Web.Services
                 foreach (var buyOrderId in buyOrders)
                 {
                     var buyOrder = await _buyOrderRepository.GetBuyOrderByIdAsync(buyOrderId);
-                    if (buyOrder.Status != false) //if buyOrder is not deleted, do the operation
+                    if (buyOrder.Status == OrderStatus.Active || buyOrder.Status == OrderStatus.PartiallyCompletedAndActive) //if buyOrder is not deleted, do the operation
                     {
                         var size = new int();
                         // determine the size
-                        if (sellOrder.AskSize < buyOrder.BidSize) //lowest one determines 
+                        if (sellOrder.CurrentAskSize < buyOrder.CurrentBidSize) //lowest one determines 
                         {
-                            size = sellOrder.AskSize;
-                            
+                            size = sellOrder.CurrentAskSize;
+                            buyOrder.Status = OrderStatus.PartiallyCompletedAndActive;
+
                         }
                         else
                         {
-                            size = buyOrder.BidSize;
+                            size = buyOrder.CurrentBidSize;
                             sellOrder.Status = OrderStatus.PartiallyCompletedAndActive; //partially completed
                         }
                         //operate the trade between matched sellOrder and buyOrder
-                        //update sellOrder related information
+                        //update sellOrder and buyOrder related information
                         await this.OperateSellOrderAsync(sellOrderId, size);
-                        await this.OperateBuyOrderAsync(buyOrder.BuyOrderId, size);
+                        await this.OperateBuyOrderAsync(buyOrderId, size);
                 
-                        //create new transaction 
-                        await _transactionRepository.AddTransactionAsync(new Transaction(default, sellOrder.UserId,
-                            buyOrder.UserId, sellOrder.StockId, size, sellOrder.AskPrice, DateTime.Now));
+                        //create new transactions
+                        await _transactionRepository.AddTransactionAsync(new Transaction(default,sellOrderId, buyOrderId, sellOrder.UserId,
+                            buyOrder.UserId, sellOrder.StockId, size, sellOrder.AskPrice));
                         //update price info according to this trade
                         await this.UpdateStockPriceAsync(sellOrder.StockId, sellOrder.AskPrice, size);
                     }
@@ -215,10 +217,10 @@ namespace Ledger.Ledger.Web.Services
             await _userRepository.UpdateBudget(sellOrder.UserId, '+', amount);
         
             // update AskSize in sellOrder
-            await _sellOrderRepository.UpdateAskSizeAsync(sellOrderId, size);
+            await _sellOrderRepository.UpdateAskSizeAsync(sellOrderId, size); 
         
             //if the AskSize is 0 logically delete
-            if (sellOrder.AskSize == 0)
+            if (sellOrder.CurrentAskSize == 0)
             {
                 await _sellOrderRepository.LogicalDelete(sellOrderId);
             }
@@ -245,18 +247,17 @@ namespace Ledger.Ledger.Web.Services
             await _userRepository.UpdateBudget(buyOrder.UserId, '-', amount);
             
             //update bidSize in buyOrder
-            //buyOrder.BidSize -= size;
             await _buyOrderRepository.UpdateBidSize(buyOrderId, size);
             
             //if the BidSize is 0 logically delete
-            if (buyOrder.BidSize == 0)
+            if (buyOrder.CurrentBidSize == 0)
             {
                 await _buyOrderRepository.LogicalDelete(buyOrderId);
             }
             return buyOrder;
         }
 
-        public async Task<int> GetLatestSellOrderId() // return the latest sellOrderId
+        public async Task<int> GetLatestSellOrderId() // return the latest sellOrderId and active olmalı !!!!!
         {
             var sellOrders = await _sellOrderRepository.GetAllSellOrdersAsync();
             var max = 0;
@@ -268,6 +269,11 @@ namespace Ledger.Ledger.Web.Services
                 }
             }
             return max;
+        }
+
+        public async Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId)
+        {
+            return await _transactionRepository.GetTransactionsOfASellOrder(sellOrderId);
         }
 
         public async Task<Stock> UpdateStockPriceAsync(int id,double newPrice, int tradeSize)
@@ -292,33 +298,8 @@ namespace Ledger.Ledger.Web.Services
                 // update only current price
                 updatedStock = await _stockRepository.UpdateStockPriceAsync(id, currentPrice, stock.HighestPrice, stock.LowestPrice);
             }
-            //commit changes 
-            //await _unitOfWork.CommitAsync();
             return updatedStock;
-           
         }
         
-        
-        //bussiness logic operations
-        /*public async Task<List<SellOrder>> MatchSellOrdersAsync(int buyOrderId, int bidSize)
-        {
-            
-            // return all matched sellOrders according to bidId and price
-            var sellOrders = await _sellOrderRepository.MatchSellOrdersAsync(buyOrderId);
-
-            var matchList = new List<SellOrder>();
-            var totalSize = 0;
-            foreach (var sellorder in sellOrders)
-            {
-                matchList.Add(sellorder);
-                totalSize += sellorder.AskSize;
-
-                if (totalSize <= bidSize)
-                {
-                    break;
-                }
-            }
-            return matchList;
-        }*/
     }
 }

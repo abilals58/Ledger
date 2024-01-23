@@ -24,6 +24,13 @@ namespace Ledger.Ledger.Web
             services.AddQuartz(q =>
             {
                 // base Quartz scheduler, job and trigger configuration
+                string jobKey = "tradeJob";
+                q.AddJob<TradeJob>(opts => opts.WithIdentity(jobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(jobKey) // link to the HelloWorldJob
+                    .WithIdentity("tradeJob-trigger") // give the trigger a unique name
+                    .WithSimpleSchedule(x => x.WithRepeatCount(0)));
+                //.WithCronSchedule("0/10 * * * * ?")); // run every 10 seconds
             });
 
             // ASP.NET Core hosting
@@ -33,12 +40,13 @@ namespace Ledger.Ledger.Web
                 options.WaitForJobsToComplete = true;
             });
             
-            
-            
             var pgString = "Host=localhost;Port=5432;Database=Ledger2;Username=postgres;Password=mysecretpassword;";
             services.AddControllers();
             // add dbcontext
-            services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
+            services.AddDbContext<ApiDbContext>(option =>
+            {
+                option.UseNpgsql(pgString);
+            });
             //services.AddDbContext<ApiDbContext>(option => option.UseInMemoryDatabase("Ledger"));
             services.AddSwaggerGen(); // add swagger
             // add interfaces for dbcontext (connection to database, database layer)
@@ -52,6 +60,7 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ITransactionRepository,TransactionRepository>();
             services.AddScoped<IDailyStockRepository, DailyStockRepository>();
             services.AddScoped<ISellOrderMatchRepository, SellOrderMatchRepository>();
+            services.AddScoped<IBuyOrderMatchRepository, BuyOrderMatchRepository>();
             
             // add interfaces and services for bussiness layer
             services.AddScoped<IUserService, UserService>();
@@ -65,19 +74,9 @@ namespace Ledger.Ledger.Web
             //services.AddScoped<IScheduler, SchedulerService>();
             
             //add interface for unitofwork
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
-
-            services.AddScoped<TradeJob>();
-
-            /*//add host scheduler
-            services.AddQuartz(configure =>
-            {
-                configure.UseMicrosoftDependencyInjectionJobFactory();
-            });
-            services.AddQuartzHostedService(option =>
-            {
-                option.WaitForJobsToComplete = true;
-            });*/
+            services.AddTransient<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddTransient<TradeJob>();
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -104,7 +103,7 @@ namespace Ledger.Ledger.Web
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ledger API V1");
                 c.RoutePrefix = string.Empty;
             });
-            
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
     }
 }

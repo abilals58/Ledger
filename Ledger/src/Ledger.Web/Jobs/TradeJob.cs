@@ -13,28 +13,23 @@ namespace Ledger.Ledger.Web.Jobs
 {
     public class TradeJob : IJob
     {
+        private IBuyOrderService _buyOrderService;
+        public TradeJob(IBuyOrderService buyOrderService)
+        {
+            _buyOrderService = buyOrderService;
+        }
+        
         public async Task Execute(IJobExecutionContext context)
         {
             try
             {
-                /*var options = new DbContextOptionsBuilder<ApiDbContext>().UseNpgsql("Host=localhost;Port=5432;Database=Ledger2;Username=postgres;Password=mysecretpassword;").Options;
-                var dbContext = new ApiDbContext(options);
-                var sellOrderRepository = new SellOrderRepository(dbContext);
-                var buyOrderRepository = new BuyOrderRepository(dbContext);
-                var stocksOfUserRepository = new StocksOfUserRepository(dbContext);
-                var transactionRepository = new TransactionRepository(dbContext);
-                var userRepository = new UserRepository(dbContext);
-                var sellOrderMatchRepository = new SellOrderMatchRepository(dbContext);
-                var stockRepository = new StockRepository(dbContext);
-                var unitOfWorkRepository = new UnitOfWork.UnitOfWork(dbContext);
-                
-                var _sellOrderService = new SellOrderService(sellOrderRepository,buyOrderRepository,stocksOfUserRepository,transactionRepository,userRepository,sellOrderMatchRepository,stockRepository,unitOfWorkRepository);*/
-                
-                //ISellOrderService _sellOrderService = (ISellOrderService)context.JobDetail.JobDataMap["sellOrderService"];
                 Console.WriteLine("TradeJob is executing.");
                 //int sellOrderId = await _sellOrderService.GetLatestSellOrderId();
                 //await _sellOrderService.MatchSellOrdersAsync(sellOrderId);
                 //await _sellOrderService.OperateTradeAsync(sellOrderId);
+                await _buyOrderService.MatchBuyOrdersAsync(1);
+                await _buyOrderService.OperateTradeAsync(1);
+
             }
             catch (Exception e)
             {

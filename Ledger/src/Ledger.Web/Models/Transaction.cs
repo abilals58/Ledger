@@ -9,12 +9,14 @@ namespace Ledger.Ledger.Web.Models
     {
         [Key]
         public  int Tid { get; set; }
+        public int SellOrderId { get; set; }
+        public int BuyOrderId { get; set; }
         public  int SellerId { get; set; }
         public  int BuyerId { get; set; }
         public  int StockId { get; set; }
         public  int StockNum { get; set; }
         public  double Price { get; set; }
-        public  DateTime Date { get; set; } = DateTime.Now;
+        public  DateTime Date { get; set; } = DateTime.Now.ToUniversalTime();
 
         //[ForeignKey("SellerId")]
         //public User Seller { get; set; }
@@ -30,17 +32,18 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public Transaction(int tid, int sellerId, int buyerId, int stockId, int stockNum, double price, DateTime date)
+        public Transaction(int tid, int sellOrderId, int buyOrderId, int sellerId, int buyerId, int stockId, int stockNum, double price)
         {
             Tid = tid;
+            SellOrderId = sellOrderId;
+            BuyOrderId = buyOrderId;
             SellerId = sellerId;
             BuyerId = buyerId;
             StockId = stockId;
             StockNum = stockNum;
             Price = price;
-            Date = date;
         }
-        
+
         public override string ToString()
         {
             return $"Tid: {Tid}, SellerId: {SellerId}, BuyerId: {BuyerId}, StockId: {StockId}, StockNum: {StockNum}, " +
