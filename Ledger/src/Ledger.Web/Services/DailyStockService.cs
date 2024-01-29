@@ -15,7 +15,6 @@ namespace Ledger.Ledger.Web.Services
         Task<DailyStock> UpdateDailyStockAsync(int id,DateTime date, DailyStock newdailystock);
         Task<DailyStock> DeleteDailyStockAsync(int id,DateTime date);
         Task<IEnumerable<DailyStock>> RecordAllDailyStocksAsync();
-
         Task<IEnumerable<DailyStock>> GetDailyStocksOfAStock(int id);
     }
     
@@ -44,52 +43,23 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<DailyStock> AddDailyStockAsync(DailyStock dailystock)
         {
-            try
-            {
-                await _dailyStockRepository.AddDailyStockAsync(dailystock);
-                await _unitOfWork.CommitAsync();
-                return dailystock;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
-            
+            await _dailyStockRepository.AddDailyStockAsync(dailystock);
+            await _unitOfWork.SaveChangesAsync();
+            return dailystock;
         }
         
         public async Task<DailyStock> UpdateDailyStockAsync(int id, DateTime date, DailyStock newdailystock)
         {
-            try
-            {
-                var dailystock = await _dailyStockRepository.UpdateDailyStockAsync(id, date, newdailystock);
-                await _unitOfWork.CommitAsync();
-                return dailystock;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
-            
+            var dailystock = await _dailyStockRepository.UpdateDailyStockAsync(id, date, newdailystock);
+            await _unitOfWork.SaveChangesAsync();
+            return dailystock;
         }
 
         public async Task<DailyStock> DeleteDailyStockAsync(int id, DateTime date)
         {
-            try
-            {
-                var dailystock = await _dailyStockRepository.DeleteDailyStockAsync(id, date);
-                await _unitOfWork.CommitAsync();
-                return dailystock;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var dailystock = await _dailyStockRepository.DeleteDailyStockAsync(id, date);
+            await _unitOfWork.SaveChangesAsync();
+            return dailystock;
         }
 
         public async Task<IEnumerable<DailyStock>> RecordAllDailyStocksAsync()
@@ -98,24 +68,15 @@ namespace Ledger.Ledger.Web.Services
             var stocks = await _stockRepository.GetAllStocksAsync();
             
             //for each stock record the current price as todays price
-            try
+            foreach (var stock in stocks)
             {
-                foreach (var stock in stocks)
-                {
-                    var date = DateTime.Today;
-                    await _dailyStockRepository.AddDailyStockAsync(new DailyStock(date, stock.StockId, stock.CurrentPrice));
-                }
-                //commit changes
-                await _unitOfWork.CommitAsync();
-                //return new version of daily stocks table
-                return await _dailyStockRepository.GetAllDailyStocksAsync();
+                var date = DateTime.Today;
+                await _dailyStockRepository.AddDailyStockAsync(new DailyStock(date, stock.StockId, stock.CurrentPrice));
             }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            //commit changes
+            await _unitOfWork.SaveChangesAsync();
+            //return new version of daily stocks table
+            return await _dailyStockRepository.GetAllDailyStocksAsync();
         }
 
         public async Task<IEnumerable<DailyStock>> GetDailyStocksOfAStock(int id)

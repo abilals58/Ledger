@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 
 namespace Ledger.Ledger.Web
 {
@@ -41,7 +43,7 @@ namespace Ledger.Ledger.Web
             });
             
             var pgString = "Host=localhost;Port=5432;Database=Ledger2;Username=postgres;Password=mysecretpassword;";
-            services.AddControllers();
+            services.AddControllers(); 
             // add dbcontext
             services.AddDbContext<ApiDbContext>(option =>
             {
@@ -77,6 +79,13 @@ namespace Ledger.Ledger.Web
             services.AddTransient<IUnitOfWork, UnitOfWork.UnitOfWork>();
             services.AddTransient<TradeJob>();
             
+            /*//inject scheduler 
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<IScheduler>(provider =>
+            {
+                ISchedulerFactory schedulerFactory = new StdSchedulerFactory();
+                return schedulerFactory.GetScheduler().Result;
+            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -90,7 +99,6 @@ namespace Ledger.Ledger.Web
             dbContext.Database.EnsureCreated();
 
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });

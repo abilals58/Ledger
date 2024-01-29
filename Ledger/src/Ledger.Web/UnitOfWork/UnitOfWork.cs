@@ -10,6 +10,8 @@ namespace Ledger.Ledger.Web.UnitOfWork
     {
         Task CommitAsync();
         Task RollBackAsync();
+        void BeginTransaction();
+        Task SaveChangesAsync();
 
     }
     
@@ -21,12 +23,20 @@ namespace Ledger.Ledger.Web.UnitOfWork
         public UnitOfWork(IDbContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+
+        public void BeginTransaction()
+        {
             _transaction = _dbContext.BeginTransaction();
         }
-        
-        public async Task CommitAsync()
+
+        public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();
+        }
+        public async Task CommitAsync()
+        {
             await _transaction.CommitAsync();
         }
         public async Task RollBackAsync()

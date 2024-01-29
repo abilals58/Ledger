@@ -13,10 +13,12 @@ namespace Ledger.Ledger.Web.Jobs
 {
     public class TradeJob : IJob
     {
-        private IBuyOrderService _buyOrderService;
-        public TradeJob(IBuyOrderService buyOrderService)
+        //private IBuyOrderService _buyOrderService;
+        private ISellOrderService _sellOrderService;
+        public TradeJob(ISellOrderService sellOrderService)
         {
-            _buyOrderService = buyOrderService;
+            //_buyOrderService = buyOrderService;
+            _sellOrderService = sellOrderService;
         }
         
         public async Task Execute(IJobExecutionContext context)
@@ -27,9 +29,8 @@ namespace Ledger.Ledger.Web.Jobs
                 //int sellOrderId = await _sellOrderService.GetLatestSellOrderId();
                 //await _sellOrderService.MatchSellOrdersAsync(sellOrderId);
                 //await _sellOrderService.OperateTradeAsync(sellOrderId);
-                await _buyOrderService.MatchBuyOrdersAsync(1);
-                await _buyOrderService.OperateTradeAsync(1);
-
+                //await _buyOrderService.MatchBuyOrdersAsync(1);
+                //await _buyOrderService.OperateTradeAsync(1);
             }
             catch (Exception e)
             {

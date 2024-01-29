@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
 using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.UnitOfWork;
+using Microsoft.VisualBasic;
 
 namespace Ledger.Ledger.Web.Services
 {
@@ -57,88 +58,53 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder)
         {
-            try
-            {
-                await _buyOrderRepository.AddBuyOrderAsync(buyOrder);
-                await _unitOfWork.CommitAsync();
-                return buyOrder;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            await _buyOrderRepository.AddBuyOrderAsync(buyOrder);
+            await _unitOfWork.SaveChangesAsync();
+            return buyOrder;
         }
 
         public async Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder)
         {
-            try
-            {
-                var buyOrder = await _buyOrderRepository.UpdateByOrderAsync(id, newbuyOrder);
-                await _unitOfWork.CommitAsync();
-                return buyOrder;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var buyOrder = await _buyOrderRepository.UpdateByOrderAsync(id, newbuyOrder);
+            await _unitOfWork.SaveChangesAsync();
+            return buyOrder;
         }
 
         public async Task<BuyOrder> DeleteBuyOrderAsync(int id)
         {
-            try
-            {
-                var buyOrder = await _buyOrderRepository.DeleteBuyOrderAsync(id);
-                await _unitOfWork.CommitAsync();
-                return buyOrder;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            } 
+            var buyOrder = await _buyOrderRepository.DeleteBuyOrderAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return buyOrder;
         }
 
         public async Task<BuyOrder> MatchBuyOrdersAsync(int buyOrderId)
         {
-            try
+            //get related buyOrder
+            var buyOrder = await _buyOrderRepository.GetBuyOrderByIdAsync(buyOrderId);
+            
+            //get all sellOrders and search for a match
+            var sellOrders = await _sellOrderRepository.GetAllSellOrdersAsync();
+            var totalSize = 0;
+            foreach (var sellOrder in sellOrders)
             {
-                //get related buyOrder
-                var buyOrder = await _buyOrderRepository.GetBuyOrderByIdAsync(buyOrderId);
-                
-                //get all sellOrders and search for a match
-                var sellOrders = await _sellOrderRepository.GetAllSellOrdersAsync();
-                var totalSize = 0;
-                foreach (var sellOrder in sellOrders)
+                if ((sellOrder.Status == OrderStatus.Active || sellOrder.Status == OrderStatus.PartiallyCompletedAndActive) && buyOrder.StockId == sellOrder.StockId && buyOrder.BidPrice == sellOrder.AskPrice)
                 {
-                    if ((sellOrder.Status == OrderStatus.Active || sellOrder.Status == OrderStatus.PartiallyCompletedAndActive) && buyOrder.StockId == sellOrder.StockId && buyOrder.BidPrice == sellOrder.AskPrice)
+                    //add new match record to the buyOrder matches
+                    await _buyOrderMatchRepository.AddBuyOrderMatchAsync(buyOrderId, sellOrder.SellOrderId);
+                    totalSize = totalSize + sellOrder.CurrentAskSize;
+                    if (totalSize >= buyOrder.CurrentBidSize)
                     {
-                        //add new match record to the buyOrder matches
-                        await _buyOrderMatchRepository.AddBuyOrderMatchAsync(buyOrderId, sellOrder.SellOrderId);
-                        totalSize = totalSize + sellOrder.CurrentAskSize;
-                        if (totalSize >= buyOrder.CurrentBidSize)
-                        {
-                            break;
-                        }
+                        break;
                     }
                 }
-                await _unitOfWork.CommitAsync();
-                return buyOrder;
             }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            await _unitOfWork.SaveChangesAsync();
+            return buyOrder;
         }
 
         public async Task<BuyOrder> OperateTradeAsync(int buyOrderId)
         {
+            _unitOfWork.BeginTransaction();
             try
             {
                 // get related buyOrder
@@ -164,7 +130,8 @@ namespace Ledger.Ledger.Web.Services
                             size = sellOrder.CurrentAskSize;
                             buyOrder.Status = OrderStatus.PartiallyCompletedAndActive;
                         }
-                        
+                        //save changes
+                        await _unitOfWork.SaveChangesAsync();
                         //operate the trade between matched buyOrder and sellOrder
                         //update sellOrder and buyOrder related information 
                         await this.OperateBuyOrderAsync(buyOrderId, size);
@@ -173,7 +140,8 @@ namespace Ledger.Ledger.Web.Services
                         //create new transaction
                         await _transactionRepository.AddTransactionAsync(new Transaction(default, sellOrderId,
                             buyOrderId, sellOrder.UserId, buyOrder.UserId, buyOrder.StockId, size, buyOrder.BidPrice));
-                        
+                        //save changes
+                        await _unitOfWork.SaveChangesAsync();
                         //update price info according to this trade
                         await this.UpdateStockPriceAsync(buyOrder.StockId, buyOrder.BidPrice, size);
                     }
@@ -212,6 +180,8 @@ namespace Ledger.Ledger.Web.Services
                 // update only current price
                 updatedStock = await _stockRepository.UpdateStockPriceAsync(stockId, currentPrice, stock.HighestPrice, stock.LowestPrice);
             }
+
+            await _unitOfWork.SaveChangesAsync();
             return updatedStock;
         }
 
@@ -233,6 +203,8 @@ namespace Ledger.Ledger.Web.Services
             {
                 await _sellOrderRepository.LogicalDelete(sellOrderId);
             }
+
+            await _unitOfWork.SaveChangesAsync();
             return sellOrder;
         }
 
@@ -263,6 +235,8 @@ namespace Ledger.Ledger.Web.Services
             {
                 await _buyOrderRepository.LogicalDelete(buyOrderId);
             }
+
+            await _unitOfWork.SaveChangesAsync();
             return buyOrder;
         }
 
