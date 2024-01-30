@@ -26,13 +26,19 @@ namespace Ledger.Ledger.Web
             services.AddQuartz(q =>
             {
                 // base Quartz scheduler, job and trigger configuration
-                string jobKey = "tradeJob";
-                q.AddJob<TradeJob>(opts => opts.WithIdentity(jobKey));
+                string sellJobKey = "sellTradeJob";
+                string buyJobKey = "buyTradeJob";
+                q.AddJob<SellTradeJob>(opts => opts.WithIdentity(sellJobKey));
                 q.AddTrigger(opts => opts
-                    .ForJob(jobKey) // link to the HelloWorldJob
-                    .WithIdentity("tradeJob-trigger") // give the trigger a unique name
-                    .WithSimpleSchedule(x => x.WithRepeatCount(0)));
-                //.WithCronSchedule("0/10 * * * * ?")); // run every 10 seconds
+                    .ForJob(sellJobKey) // link to the tradeJob
+                    .WithIdentity("sellTradeJob-trigger") // give the trigger a unique name
+                    .WithCronSchedule("0/10 * * * * ?")); // run every 10 seconds
+                //.WithSimpleSchedule(x => x.WithRepeatCount(0)));
+                q.AddJob<BuyTradeJob>(opts => opts.WithIdentity(buyJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(buyJobKey)
+                    .WithIdentity("buyTradeJob-trigger")
+                    .WithCronSchedule("0/10 * * * * ?"));
             });
 
             // ASP.NET Core hosting
@@ -77,7 +83,7 @@ namespace Ledger.Ledger.Web
             
             //add interface for unitofwork
             services.AddTransient<IUnitOfWork, UnitOfWork.UnitOfWork>();
-            services.AddTransient<TradeJob>();
+            services.AddTransient<SellTradeJob>();
             
             /*//inject scheduler 
             services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();

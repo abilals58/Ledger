@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
@@ -13,9 +15,10 @@ namespace Ledger.Ledger.Web.Repositories
         Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder);
         Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder);
         Task<BuyOrder> DeleteBuyOrderAsync(int id);
-        //Task<BuyOrder> OperateBuyOrderAsync(int id);
         Task UpdateBidSize(int id, int size); //decrement the bidSize by given size
         Task LogicalDelete(int id); // change the status of buyOrder false (deleted)
+        Task<IEnumerable<int>> GetMatchedBuyOrderIds(SellOrder sellOrder); // returns matched buyOrderIds with given sellOrderId
+        Task<IEnumerable<int>> GetLatestBuyOrderIds();
 
     }
     
@@ -76,6 +79,44 @@ namespace Ledger.Ledger.Web.Repositories
         {
             var buyOrder = await _dbBuyOrder.FindAsync(id);
             buyOrder.Status = OrderStatus.CompletedAndDeleted;
+        }
+
+        public async Task<IEnumerable<int>> GetMatchedBuyOrderIds(SellOrder sellOrder)
+        {
+            //retrieve matched buyOrders
+            var buyOrders =  await _dbBuyOrder.Where(b =>
+                    (b.Status != OrderStatus.IsMatched) && (b.Status == OrderStatus.Active || b.Status == OrderStatus.PartiallyCompletedAndActive)
+                                                        && b.StockId == sellOrder.StockId &&
+                                                        b.BidPrice == sellOrder.AskPrice)
+                .Select(b => b.BuyOrderId)
+                .ToListAsync();
+
+            if (buyOrders.Count == 0) // if there is no match, return null
+            {
+                return null;
+            }
+            
+            var matchedBuyOrders = new List<int>();
+            var totalSize = 0;
+            //update status of matched buyOrders
+            foreach (var buyOrderId in buyOrders)
+            {
+                var buyOrder = await _dbBuyOrder.FindAsync(buyOrderId);
+                buyOrder.Status = OrderStatus.IsMatched;
+                matchedBuyOrders.Add(buyOrderId);
+                totalSize = totalSize + buyOrder.CurrentBidSize;
+                if (totalSize >= sellOrder.CurrentAskSize)
+                {
+                    break;
+                }
+            }
+            return matchedBuyOrders;
+        }
+
+        public async Task<IEnumerable<int>> GetLatestBuyOrderIds()
+        {
+            return await _dbBuyOrder.Where(b => b.Status == OrderStatus.IsMatched).OrderBy(b => b.BuyOrderId).Select(b=>b.BuyOrderId)
+                .ToListAsync();
         }
     }
 }

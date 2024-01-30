@@ -14,12 +14,14 @@ namespace Ledger.Ledger.Web.Models
         PartiallyCompletedAndActive=2,
         [Description("Not Active, will activated on the beginning of the next day")]
         NotYetActive = 3,
+        [Description("Matched, will be operated")]
+        IsMatched = 4,
         [Description("Completed and deleted")]
-        CompletedAndDeleted = 4,
+        CompletedAndDeleted = 5,
         [Description("Partially completed and deleted")]
-        PartiallyCompletedAndDeleted = 5,
+        PartiallyCompletedAndDeleted = 6,
         [Description("Not completed and deleted")]
-        NotCompletedAndDeleted = 6
+        NotCompletedAndDeleted = 7
     }
     
     public class SellOrder // This class refers to the object which stores relevant information about a sell order. It has SellOrderId (primary key),

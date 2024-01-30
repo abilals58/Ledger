@@ -20,6 +20,7 @@ namespace Ledger.Ledger.Web.Services
         Task<Stock> UpdateStockPriceAsync(int stockId, double newPrice, int tradeSize);
         Task<SellOrder> OperateSellOrderAsync(int sellOrderId, int size);
         Task<BuyOrder> OperateBuyOrderAsync(int buyOrderId, int size);
+        Task<IEnumerable<int>> GetLatestBuyOrderIds();
 
         Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId);
 
@@ -58,9 +59,22 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder)
         {
-            await _buyOrderRepository.AddBuyOrderAsync(buyOrder);
-            await _unitOfWork.SaveChangesAsync();
-            return buyOrder;
+            _unitOfWork.BeginSerializableTransaction();
+            try
+            {
+                await _buyOrderRepository.AddBuyOrderAsync(buyOrder);
+                await _unitOfWork.SaveChangesAsync();
+                // add job signal (changing status of buyOrder if it is matched)
+                await this.MatchBuyOrdersAsync(buyOrder.BuyOrderId);
+                await _unitOfWork.CommitAsync();
+                return buyOrder;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.RollBackAsync();
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder)
@@ -82,21 +96,21 @@ namespace Ledger.Ledger.Web.Services
             //get related buyOrder
             var buyOrder = await _buyOrderRepository.GetBuyOrderByIdAsync(buyOrderId);
             
-            //get all sellOrders and search for a match
-            var sellOrders = await _sellOrderRepository.GetAllSellOrdersAsync();
-            var totalSize = 0;
-            foreach (var sellOrder in sellOrders)
+            //get ids of matched sellOrders
+            var sellOrders = await _sellOrderRepository.GetMatchedSellOrderIds(buyOrder);
+            if (sellOrders == null)
             {
-                if ((sellOrder.Status == OrderStatus.Active || sellOrder.Status == OrderStatus.PartiallyCompletedAndActive) && buyOrder.StockId == sellOrder.StockId && buyOrder.BidPrice == sellOrder.AskPrice)
-                {
-                    //add new match record to the buyOrder matches
-                    await _buyOrderMatchRepository.AddBuyOrderMatchAsync(buyOrderId, sellOrder.SellOrderId);
-                    totalSize = totalSize + sellOrder.CurrentAskSize;
-                    if (totalSize >= buyOrder.CurrentBidSize)
-                    {
-                        break;
-                    }
-                }
+                return null;
+            }
+            //change status of buyOrder
+            buyOrder.Status = OrderStatus.IsMatched;
+            await _unitOfWork.SaveChangesAsync();
+            
+            foreach (var sellOrderId in sellOrders)
+            {
+                //add new match record to the buyOrder matches
+                await _buyOrderMatchRepository.AddBuyOrderMatchAsync(buyOrderId, sellOrderId);
+                
             }
             await _unitOfWork.SaveChangesAsync();
             return buyOrder;
@@ -116,7 +130,7 @@ namespace Ledger.Ledger.Web.Services
                 foreach (var sellOrderId in sellOrders)
                 {
                     var sellOrder = await _sellOrderRepository.GetSellOrderByIdAsync(sellOrderId);
-                    if (sellOrder.Status == OrderStatus.Active || sellOrder.Status == OrderStatus.PartiallyCompletedAndActive) //if sellOrder is not deleted, do the operation
+                    if (sellOrder.Status == OrderStatus.IsMatched ) //if sellOrder is not deleted, do the operation
                     {
                         //determine the size
                         var size = new int();
@@ -240,6 +254,10 @@ namespace Ledger.Ledger.Web.Services
             return buyOrder;
         }
 
+        public async Task<IEnumerable<int>> GetLatestBuyOrderIds()
+        {
+            return await _buyOrderRepository.GetLatestBuyOrderIds();
+        }
         public async Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId)
         {
             return await _transactionRepository.GetTransactionsOfABuyOrder(buyOrderId);

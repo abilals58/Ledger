@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Transactions;
 using Ledger.Ledger.Web.Data;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -11,6 +12,7 @@ namespace Ledger.Ledger.Web.UnitOfWork
         Task CommitAsync();
         Task RollBackAsync();
         void BeginTransaction();
+        void BeginSerializableTransaction();
         Task SaveChangesAsync();
 
     }
@@ -24,13 +26,16 @@ namespace Ledger.Ledger.Web.UnitOfWork
         {
             _dbContext = dbContext;
         }
-
-
+        
         public void BeginTransaction()
         {
             _transaction = _dbContext.BeginTransaction();
         }
 
+        public void BeginSerializableTransaction()
+        {
+            _transaction = _dbContext.BeginSerializableTransaction();
+        }
         public async Task SaveChangesAsync()
         {
             await _dbContext.SaveChangesAsync();

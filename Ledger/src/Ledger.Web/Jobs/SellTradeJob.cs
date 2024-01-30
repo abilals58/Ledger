@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Repositories;
@@ -11,11 +12,11 @@ using Quartz.Logging;
 
 namespace Ledger.Ledger.Web.Jobs
 {
-    public class TradeJob : IJob
+    public class SellTradeJob : IJob
     {
         //private IBuyOrderService _buyOrderService;
         private ISellOrderService _sellOrderService;
-        public TradeJob(ISellOrderService sellOrderService)
+        public SellTradeJob(ISellOrderService sellOrderService)
         {
             //_buyOrderService = buyOrderService;
             _sellOrderService = sellOrderService;
@@ -25,12 +26,15 @@ namespace Ledger.Ledger.Web.Jobs
         {
             try
             {
-                Console.WriteLine("TradeJob is executing.");
-                //int sellOrderId = await _sellOrderService.GetLatestSellOrderId();
-                //await _sellOrderService.MatchSellOrdersAsync(sellOrderId);
-                //await _sellOrderService.OperateTradeAsync(sellOrderId);
-                //await _buyOrderService.MatchBuyOrdersAsync(1);
-                //await _buyOrderService.OperateTradeAsync(1);
+                Console.WriteLine("SellTradeJob is executing.");
+                var sellOrders = await _sellOrderService.GetLatestSellOrderIds();
+                if (sellOrders.Count()!= 0)
+                {
+                    foreach (var sellOrder in sellOrders)
+                    {
+                        await _sellOrderService.OperateTradeAsync(sellOrder);
+                    }
+                }
             }
             catch (Exception e)
             {

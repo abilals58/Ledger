@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Transactions;
 using Ledger.Ledger.Web.Jobs;
 using Ledger.Ledger.Web.Models;
 using Ledger.Ledger.Web.Repositories;
 using Ledger.Ledger.Web.UnitOfWork;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
+using Transaction = Ledger.Ledger.Web.Models.Transaction;
 
 namespace Ledger.Ledger.Web.Services
 {
@@ -25,7 +27,7 @@ namespace Ledger.Ledger.Web.Services
         Task<SellOrder> OperateSellOrderAsync(int sellOrderId, int size);
         Task<BuyOrder> OperateBuyOrderAsync(int buyOrderId, int size);
 
-        Task<int> GetLatestSellOrderId();
+        Task<IEnumerable<int>> GetLatestSellOrderIds();
         Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId); // returns transactions related to a sellOrder
 
     }
@@ -63,9 +65,23 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<SellOrder> AddSellOrderAsync(SellOrder sellOrder)
         {
-            await _sellOrderRepository.AddSellOrderAsync(sellOrder);
-            await _unitOfWork.SaveChangesAsync();
-            return sellOrder;
+            _unitOfWork.BeginSerializableTransaction();
+            try
+            {
+                //add new sellOrder
+                await _sellOrderRepository.AddSellOrderAsync(sellOrder);
+                await _unitOfWork.SaveChangesAsync();
+                // add job signal (changing status of sellOrder if it is matched)
+                await this.MatchSellOrdersAsync(sellOrder.SellOrderId);
+                await _unitOfWork.CommitAsync();
+                return sellOrder;
+            }
+            catch (Exception e)
+            {
+                await _unitOfWork.CommitAsync();
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public async Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder)
@@ -82,34 +98,27 @@ namespace Ledger.Ledger.Web.Services
             return sellOrder;
         }
 
-        public async Task<SellOrder>
-            MatchSellOrdersAsync(int sellOrderId) // for a sell order, it matches buyOrder with same Price and id
-            // then add matched buyOrders to the Matched List up to the size  limit
+        public async Task<SellOrder>  MatchSellOrdersAsync(int sellOrderId) // for a sell order, it matches buyOrder with same Price and id // then add matched buyOrders to the Matched List up to the size  limit
         {
             // get the related sellOrder
             var sellOrder = await _sellOrderRepository.GetSellOrderByIdAsync(sellOrderId);
 
-            //get all buyOrders and search for a match
-            var buyOrders = await _buyOrderRepository.GetAllBuyOrdersAsync();
-            var totalSize = 0;
-
-            foreach (var buyOrder in buyOrders)
+            //get ids of matchedBuyOrders
+            var buyOrders = await _buyOrderRepository.GetMatchedBuyOrderIds(sellOrder);
+            if (buyOrders == null)
             {
-                //check for the stockId and price and deleted --status:false/not deleted --status:true
-                if ((buyOrder.Status == OrderStatus.Active || buyOrder.Status == OrderStatus.PartiallyCompletedAndActive) && sellOrder.StockId == buyOrder.StockId &&
-                    sellOrder.AskPrice == buyOrder.BidPrice)
-                {
-                    // add  new match record to the sellOrderMatchs
-                    await _sellOrderMatchRepository.AddSellOrderMatchAsync(sellOrderId, buyOrder.BuyOrderId);
-                    totalSize = totalSize + buyOrder.CurrentBidSize;
-
-                    if (totalSize >= sellOrder.CurrentAskSize)
-                    {
-                        break;
-                    }
-                }
+                return null;
             }
-
+            //change status of sellOrder 
+            sellOrder.Status = OrderStatus.IsMatched;
+            await _unitOfWork.SaveChangesAsync();
+        
+            // add new match records to the database
+            foreach (var buyOrderId in buyOrders)
+            {
+                // add  new match record to the sellOrderMatchs
+                await _sellOrderMatchRepository.AddSellOrderMatchAsync(sellOrderId, buyOrderId);
+            }
             await _unitOfWork.SaveChangesAsync();
             return sellOrder;
         }
@@ -129,7 +138,7 @@ namespace Ledger.Ledger.Web.Services
                 foreach (var buyOrderId in buyOrders)
                 {
                     var buyOrder = await _buyOrderRepository.GetBuyOrderByIdAsync(buyOrderId);
-                    if (buyOrder.Status == OrderStatus.Active || buyOrder.Status == OrderStatus.PartiallyCompletedAndActive) //if buyOrder is not deleted, do the operation
+                    if (buyOrder.Status == OrderStatus.IsMatched ) //if buyOrder is not deleted, do the operation
                     {
                         var size = new int();
                         // determine the size
@@ -227,18 +236,9 @@ namespace Ledger.Ledger.Web.Services
             return buyOrder;
         }
 
-        public async Task<int> GetLatestSellOrderId() // return the latest sellOrderId and active olmalı !!!!!
+        public async Task<IEnumerable<int>> GetLatestSellOrderIds() // return the latest sellOrderIds (isMatched)
         {
-            var sellOrders = await _sellOrderRepository.GetAllSellOrdersAsync();
-            var max = 0;
-            foreach (var sellOrder in sellOrders)
-            {
-                if (sellOrder.SellOrderId > max)
-                {
-                    max = sellOrder.SellOrderId;
-                }
-            }
-            return max;
+            return await _sellOrderRepository.GetLatestSellOderIds();
         }
 
         public async Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId)

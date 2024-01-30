@@ -1,7 +1,10 @@
+using System.Data;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using static System.Transactions.IsolationLevel;
+using Transaction = Ledger.Ledger.Web.Models.Transaction;
 
 namespace Ledger.Ledger.Web.Data
 {
@@ -19,6 +22,7 @@ namespace Ledger.Ledger.Web.Data
         DbSet<BuyOrderMatch> BuyOrderMatches { get; set; }
 
         IDbContextTransaction BeginTransaction();
+        IDbContextTransaction BeginSerializableTransaction();
         Task<int> SaveChangesAsync();
     }
     public class ApiDbContext : DbContext, IDbContext
@@ -44,12 +48,15 @@ namespace Ledger.Ledger.Web.Data
         {
             return  base.Database.BeginTransaction();
         }
+        public IDbContextTransaction BeginSerializableTransaction()
+        {
+            return base.Database.BeginTransaction(IsolationLevel.Serializable);
+        }
 
         public async Task<int> SaveChangesAsync()
         {
             return await base.SaveChangesAsync();
         }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure composite primary key for Dailystocks entity
