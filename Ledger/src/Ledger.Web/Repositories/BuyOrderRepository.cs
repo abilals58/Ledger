@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
@@ -13,9 +15,10 @@ namespace Ledger.Ledger.Web.Repositories
         Task<BuyOrder> AddBuyOrderAsync(BuyOrder buyOrder);
         Task<BuyOrder> UpdateByOrderAsync(int id, BuyOrder newbuyOrder);
         Task<BuyOrder> DeleteBuyOrderAsync(int id);
-        //Task<BuyOrder> OperateBuyOrderAsync(int id);
         Task UpdateBidSize(int id, int size); //decrement the bidSize by given size
         Task LogicalDelete(int id); // change the status of buyOrder false (deleted)
+        Task<IEnumerable<int>> GetMatchedBuyOrderIds(SellOrder sellOrder); // returns matched buyOrderIds with given sellOrderId
+        Task<IEnumerable<int>> GetLatestBuyOrderIds();
 
     }
     
@@ -54,9 +57,7 @@ namespace Ledger.Ledger.Web.Repositories
             buyOrder.StockId = newbuyOrder.StockId;
             buyOrder.BidPrice = newbuyOrder.BidSize;
             buyOrder.BidSize = newbuyOrder.BidSize;
-            buyOrder.DateCreated = newbuyOrder.DateCreated;
             buyOrder.StartDate = newbuyOrder.StartDate;
-            buyOrder.EndDate = newbuyOrder.EndDate;
             return buyOrder;
         }
 
@@ -71,34 +72,51 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task UpdateBidSize(int id, int size)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(id);
-            buyOrder.BidSize = buyOrder.BidSize - size;
+            buyOrder.CurrentBidSize = buyOrder.CurrentBidSize - size;
         }
         
         public async Task LogicalDelete(int id) //changes the status to deleted (no)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(id);
-            buyOrder.Status = false;
+            buyOrder.Status = OrderStatus.CompletedAndDeleted;
         }
 
-        /*public async Task<BuyOrder> OperateBuyOrderAsync(int id)  bussiness layera taşınacak
+        public async Task<IEnumerable<int>> GetMatchedBuyOrderIds(SellOrder sellOrder)
         {
-            //get related buyOrder object
-            var buyOrder = await _dbBuyOrder.FindAsync(id);
-            // change the stocksOfUser information accordingly
-            var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(buyOrder.UserId, buyOrder.StockId);
-            stocksOfUser.NumOfStocks += buyOrder.BidSize;
-            
-            //change the user budget accordingly
-            var user = await _dbContext.Users.FindAsync(buyOrder.UserId);
-            user.Budget -= buyOrder.BidSize * buyOrder.BidPrice;
-            
-            //update the buyOrder status
-            buyOrder.Status = false; //operation is done, logicaly deleted
-            
-            //saving the changes to database
-            await _dbContext.SaveChangesAsync();
+            //retrieve matched buyOrders
+            var buyOrders =  await _dbBuyOrder.Where(b =>
+                    (b.Status != OrderStatus.IsMatched) && (b.Status == OrderStatus.Active || b.Status == OrderStatus.PartiallyCompletedAndActive)
+                                                        && b.StockId == sellOrder.StockId &&
+                                                        b.BidPrice == sellOrder.AskPrice)
+                .Select(b => b.BuyOrderId)
+                .ToListAsync();
 
-            return buyOrder;
-        }*/
+            if (buyOrders.Count == 0) // if there is no match, return null
+            {
+                return null;
+            }
+            
+            var matchedBuyOrders = new List<int>();
+            var totalSize = 0;
+            //update status of matched buyOrders
+            foreach (var buyOrderId in buyOrders)
+            {
+                var buyOrder = await _dbBuyOrder.FindAsync(buyOrderId);
+                buyOrder.Status = OrderStatus.IsMatched;
+                matchedBuyOrders.Add(buyOrderId);
+                totalSize = totalSize + buyOrder.CurrentBidSize;
+                if (totalSize >= sellOrder.CurrentAskSize)
+                {
+                    break;
+                }
+            }
+            return matchedBuyOrders;
+        }
+
+        public async Task<IEnumerable<int>> GetLatestBuyOrderIds()
+        {
+            return await _dbBuyOrder.Where(b => b.Status == OrderStatus.IsMatched).OrderBy(b => b.BuyOrderId).Select(b=>b.BuyOrderId)
+                .ToListAsync();
+        }
     }
 }

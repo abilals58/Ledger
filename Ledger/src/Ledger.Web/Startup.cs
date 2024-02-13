@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 
 namespace Ledger.Ledger.Web
 {
@@ -24,6 +26,19 @@ namespace Ledger.Ledger.Web
             services.AddQuartz(q =>
             {
                 // base Quartz scheduler, job and trigger configuration
+                string sellJobKey = "sellTradeJob";
+                string buyJobKey = "buyTradeJob";
+                q.AddJob<SellTradeJob>(opts => opts.WithIdentity(sellJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(sellJobKey) // link to the tradeJob
+                    .WithIdentity("sellTradeJob-trigger") // give the trigger a unique name
+                    .WithCronSchedule("0/10 * * * * ?")); // run every 10 seconds
+                //.WithSimpleSchedule(x => x.WithRepeatCount(0)));
+                q.AddJob<BuyTradeJob>(opts => opts.WithIdentity(buyJobKey));
+                q.AddTrigger(opts => opts
+                    .ForJob(buyJobKey)
+                    .WithIdentity("buyTradeJob-trigger")
+                    .WithCronSchedule("0/10 * * * * ?"));
             });
 
             // ASP.NET Core hosting
@@ -33,12 +48,13 @@ namespace Ledger.Ledger.Web
                 options.WaitForJobsToComplete = true;
             });
             
-            
-            
             var pgString = "Host=localhost;Port=5432;Database=Ledger2;Username=postgres;Password=mysecretpassword;";
-            services.AddControllers();
+            services.AddControllers(); 
             // add dbcontext
-            services.AddDbContext<ApiDbContext>(option => option.UseNpgsql(pgString));
+            services.AddDbContext<ApiDbContext>(option =>
+            {
+                option.UseNpgsql(pgString);
+            });
             //services.AddDbContext<ApiDbContext>(option => option.UseInMemoryDatabase("Ledger"));
             services.AddSwaggerGen(); // add swagger
             // add interfaces for dbcontext (connection to database, database layer)
@@ -52,6 +68,7 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ITransactionRepository,TransactionRepository>();
             services.AddScoped<IDailyStockRepository, DailyStockRepository>();
             services.AddScoped<ISellOrderMatchRepository, SellOrderMatchRepository>();
+            services.AddScoped<IBuyOrderMatchRepository, BuyOrderMatchRepository>();
             
             // add interfaces and services for bussiness layer
             services.AddScoped<IUserService, UserService>();
@@ -65,18 +82,15 @@ namespace Ledger.Ledger.Web
             //services.AddScoped<IScheduler, SchedulerService>();
             
             //add interface for unitofwork
-            services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
-
-            services.AddScoped<TradeJob>();
-
-            /*//add host scheduler
-            services.AddQuartz(configure =>
+            services.AddTransient<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            services.AddTransient<SellTradeJob>();
+            
+            /*//inject scheduler 
+            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+            services.AddSingleton<IScheduler>(provider =>
             {
-                configure.UseMicrosoftDependencyInjectionJobFactory();
-            });
-            services.AddQuartzHostedService(option =>
-            {
-                option.WaitForJobsToComplete = true;
+                ISchedulerFactory schedulerFactory = new StdSchedulerFactory();
+                return schedulerFactory.GetScheduler().Result;
             });*/
         }
 
@@ -91,7 +105,6 @@ namespace Ledger.Ledger.Web
             dbContext.Database.EnsureCreated();
 
             app.UseRouting();
-
             app.UseEndpoints(endpoints =>
             {
                 //endpoints.MapGet("/", async context => { await context.Response.WriteAsync("Hello World!"); });
@@ -104,7 +117,7 @@ namespace Ledger.Ledger.Web
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ledger API V1");
                 c.RoutePrefix = string.Empty;
             });
-            
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
     }
 }

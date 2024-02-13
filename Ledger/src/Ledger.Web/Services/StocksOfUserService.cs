@@ -39,52 +39,23 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<StocksOfUser> AddStocksOfUserAsync(StocksOfUser stocksOfUser)
         {
-            try
-            {
-                await _stocksOfUserRepository.AddStocksOfUserAsync(stocksOfUser);
-                await _unitOfWork.CommitAsync();
-                return stocksOfUser;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
-                  
+            await _stocksOfUserRepository.AddStocksOfUserAsync(stocksOfUser);
+            await _unitOfWork.SaveChangesAsync();
+            return stocksOfUser;
         }
 
         public async Task<StocksOfUser> UpdateStocksOfUserAsync(int id, StocksOfUser newStocksOfUser)
         {
-            try
-            {
-                var stocksOfUser = await _stocksOfUserRepository.UpdateStocksOfUserAsync(id, newStocksOfUser);
-                await _unitOfWork.CommitAsync();
-                return stocksOfUser;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
-                    
+            var stocksOfUser = await _stocksOfUserRepository.UpdateStocksOfUserAsync(id, newStocksOfUser);
+            await _unitOfWork.SaveChangesAsync();
+            return stocksOfUser;
         }
 
         public async Task<StocksOfUser> DeleteStocksOfUserAsync(int id)
         {
-            try
-            {
-                var stocksOfUser = await _stocksOfUserRepository.DeleteStocksOfUserAsync(id);
-                await _unitOfWork.CommitAsync();
-                return stocksOfUser;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var stocksOfUser = await _stocksOfUserRepository.DeleteStocksOfUserAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return stocksOfUser;
         }
     }
 }

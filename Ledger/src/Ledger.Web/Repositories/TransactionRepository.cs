@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
@@ -14,7 +15,9 @@ namespace Ledger.Ledger.Web.Repositories
         Task<Transaction> AddTransactionAsync(Transaction transaction);
         Task<Transaction> UpdateTransactionAsync(int id, Transaction newtransaction);
         Task<Transaction> DeleteTransactionAsync(int id);
-        
+
+        Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId);
+        Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId);
     }
 
     public class TransactionRepository : ITransactionRepository // Transaction service corresponds to data tier and handles database operations
@@ -63,6 +66,16 @@ namespace Ledger.Ledger.Web.Repositories
         if (transaction == null) return null;
         _dbTransaction.Remove(transaction);
         return transaction;
+    }
+
+    public async Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId)
+    {
+        return await _dbTransaction.Where(t => t.SellOrderId == sellOrderId).ToListAsync();
+    }
+
+    public async Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId)
+    {
+        return await _dbTransaction.Where(t => t.BuyOrderId == buyOrderId).ToListAsync();
     }
     }
 }

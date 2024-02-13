@@ -14,12 +14,14 @@ namespace Ledger.Ledger.Web.Models
         PartiallyCompletedAndActive=2,
         [Description("Not Active, will activated on the beginning of the next day")]
         NotYetActive = 3,
+        [Description("Matched, will be operated")]
+        IsMatched = 4,
         [Description("Completed and deleted")]
-        CompletedAndDeleted = 4,
+        CompletedAndDeleted = 5,
         [Description("Partially completed and deleted")]
-        PartiallyCompletedAndDeleted = 5,
+        PartiallyCompletedAndDeleted = 6,
         [Description("Not completed and deleted")]
-        NotCompletedAndDeleted = 6
+        NotCompletedAndDeleted = 7
     }
     
     public class SellOrder // This class refers to the object which stores relevant information about a sell order. It has SellOrderId (primary key),
@@ -31,15 +33,11 @@ namespace Ledger.Ledger.Web.Models
         public  int StockId { get; set; }
         public  double AskPrice { get; set; }
         public  int AskSize { get; set; }
-        public  DateTime DateCreated { get; set; } = DateTime.Now;
-        public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,sell order is active from startdate to enddate
-        public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
+        
+        public int CurrentAskSize { get; set; } //current available askSize, if it is 0 then the sellOrder is deleted 
+        public  DateTime StartDate { get; set; } = DateTime.Now.ToUniversalTime(); //sell order is active from startdate to end of the day
 
         public OrderStatus Status { get; set; } = OrderStatus.Active; // ture: not deleted, false: deleted
-        
-        public bool IsMatched { get; set; } = false;
-        //public bool IsActive { get; set; } = true; // true: active, false: not active (out of working times)
-        
         
         //[ForeignKey("UserId")]
         //public User User { get; set; } //navigation property
@@ -52,14 +50,14 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public SellOrder(int sellOrderId, int userId, int stockId, double askPrice, int askSize, bool isMatched)
+        public SellOrder(int sellOrderId, int userId, int stockId, double askPrice, int askSize)
         {
             SellOrderId = sellOrderId;
             UserId = userId;
             StockId = stockId;
             AskPrice = askPrice;
             AskSize = askSize;
-            IsMatched = isMatched;
+            CurrentAskSize = askSize;
             //check whether in working hours or not 
             if (DateTime.Now.Hour > 9 && DateTime.Now.Hour < 17)
             {
@@ -74,7 +72,7 @@ namespace Ledger.Ledger.Web.Models
         public override string ToString()
         {
             return $"SellOrderId: {SellOrderId}, UserId: {UserId}, StockId: {StockId}, AskPrice: {AskPrice}, AskSize: {AskSize}, " +
-                   $"DateCreated: {DateCreated}, StartDate: {StartDate}, EndDate: {EndDate}, Status: {Status}";
+                   $" StartDate: {StartDate}, Status: {Status}";
         }
 
     }

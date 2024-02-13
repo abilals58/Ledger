@@ -4,9 +4,7 @@ namespace Ledger.Ledger.Web.Models
 {
     public class SellOrderMatch
     {
-        [Key]
         public int SellOrderId { get; set; }
-        [Key]
         public int BuyOrderId { get; set; }
 
         public SellOrderMatch()
@@ -20,5 +18,4 @@ namespace Ledger.Ledger.Web.Models
             BuyOrderId = buyOrderId;
         }
     }
-    
 }

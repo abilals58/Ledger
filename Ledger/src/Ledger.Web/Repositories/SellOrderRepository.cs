@@ -15,10 +15,10 @@ namespace Ledger.Ledger.Web.Repositories
         Task<SellOrder> UpdateSellOrderAsync(int id, SellOrder newSellOrder);
         Task<SellOrder> DeleteSellOrderAsync(int id);
         Task UpdateAskSizeAsync(int id, int size);
-
+        Task<IEnumerable<int>> GetMatchedSellOrderIds(BuyOrder buyOrder);
+        Task<IEnumerable<int>> GetLatestSellOderIds();
         Task LogicalDelete(int id);
-        //Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId);
-        //Task<SellOrder> OperateSellOrderAsync(int id);
+        //Task<IEnumerable<int>> MatchBuyOrdersAsync(int sellOrderId);
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
     {
@@ -54,9 +54,7 @@ namespace Ledger.Ledger.Web.Repositories
             sellOrder.StockId = newSellOrder.StockId;
             sellOrder.AskPrice = newSellOrder.AskPrice;
             sellOrder.AskSize = newSellOrder.AskSize;
-            sellOrder.DateCreated = newSellOrder.DateCreated;
             sellOrder.StartDate = newSellOrder.StartDate;
-            sellOrder.EndDate = newSellOrder.EndDate;
             return sellOrder;
         }
         
@@ -71,47 +69,51 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task UpdateAskSizeAsync(int id, int size) //decrements the askSize by given size
         {
             var sellOrder = await _dbSellOrder.FindAsync(id);
-            sellOrder.AskSize = sellOrder.AskSize - size;
+            sellOrder.CurrentAskSize = sellOrder.CurrentAskSize - size;
         }
+
+        public async Task<IEnumerable<int>> GetMatchedSellOrderIds(BuyOrder buyOrder)
+        {
+            // retrieve matched sellOrders
+            var sellOrders = await _dbSellOrder.Where(s =>
+                (s.Status == OrderStatus.Active || s.Status == OrderStatus.PartiallyCompletedAndActive) &&
+                s.StockId == buyOrder.StockId && s.AskPrice == buyOrder.BidPrice).Select(s=>s.SellOrderId).ToListAsync();
+
+            if (sellOrders.Count() == 0) //if there is no match, return null
+            {
+                return null;
+            }
+
+            var matchedSellOrders = new List<int>();
+            var totalSize = 0;
+            // change status of matched sellOrdes
+            foreach (var sellOrderId in sellOrders)
+            {
+                var sellOrder = await _dbSellOrder.FindAsync(sellOrderId);
+                sellOrder.Status = OrderStatus.IsMatched;
+                matchedSellOrders.Add(sellOrderId);
+                totalSize = totalSize + sellOrder.CurrentAskSize;
+                if (totalSize >= buyOrder.CurrentBidSize )
+                {
+                    break;
+                }
+            }
+
+            return matchedSellOrders;
+        }
+
+        public async Task<IEnumerable<int>> GetLatestSellOderIds()
+        {
+            return await _dbSellOrder.Where(s => s.Status == OrderStatus.IsMatched).OrderBy(s=>s.SellOrderId).Select(s => s.SellOrderId)
+                .ToListAsync();
+        }
+        
+        
 
         public async Task LogicalDelete(int id) //changes the status to deleted (no)
         {
             var sellOrder = await _dbSellOrder.FindAsync(id);
             sellOrder.Status = OrderStatus.CompletedAndDeleted;
         }
-
-        /*public async Task<IEnumerable<SellOrder>> MatchSellOrdersAsync(int buyorderId)
-        {
-            //find buyorder by given id
-            var buyorder = await _dbContext.BuyOrders.FindAsync(buyorderId);
-            if (buyorder == null)
-            {
-                return null;
-            }
-            var stockid = buyorder.StockId;
-            var price = buyorder.BidPrice;
-            return await _dbContext.SellOrders.Where(s => s.StockId == stockid && s.AskPrice == price).ToListAsync();
-        }
-
-        public async Task<SellOrder> OperateSellOrderAsync(int id)
-        {
-            //get related sellOrder object
-            var sellOrder = await _dbContext.SellOrders.FindAsync(id);
-            // change the stocksOfUser information accordingly
-            var stocksOfUser = await _dbContext.StocksOfUser.FindAsync(sellOrder.UserId, sellOrder.StockId);
-            stocksOfUser.NumOfStocks -= sellOrder.AskSize;
-            
-            //change the user budget accordingly
-            var user = await _dbContext.Users.FindAsync(sellOrder.UserId);
-            user.Budget += sellOrder.AskSize * sellOrder.AskPrice;
-            
-            //update the sellOrder status
-            sellOrder.Status = false; //operation is done, logicaly deleted
-            
-            //saving the changes to database
-            await _dbContext.SaveChangesAsync();
-
-            return sellOrder;
-        }*/
     }
 }

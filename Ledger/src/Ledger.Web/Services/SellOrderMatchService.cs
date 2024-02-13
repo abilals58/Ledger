@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Models;
 using Ledger.Ledger.Web.Repositories;
+using Ledger.Ledger.Web.UnitOfWork;
 
 namespace Ledger.Ledger.Web.Services
 {
@@ -17,10 +18,12 @@ namespace Ledger.Ledger.Web.Services
     public class SellOrderMatchService :ISellOrderMatchService
     {
         private readonly ISellOrderMatchRepository _sellOrderMatchRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SellOrderMatchService(ISellOrderMatchRepository sellOrderMatchRepository)
+        public SellOrderMatchService(ISellOrderMatchRepository sellOrderMatchRepository, IUnitOfWork unitOfWork)
         {
             _sellOrderMatchRepository = sellOrderMatchRepository;
+            _unitOfWork = unitOfWork;
         }
         
         public async Task<IEnumerable<SellOrderMatch>> GetAllSellOrdersAsync()
@@ -35,7 +38,9 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<SellOrderMatch> AddSellOrderMatchAsync(int sellOrderId, int buyOrderId)
         {
-            return await _sellOrderMatchRepository.AddSellOrderMatchAsync(sellOrderId, buyOrderId);
+            var sellOrderMatch =  await _sellOrderMatchRepository.AddSellOrderMatchAsync(sellOrderId, buyOrderId);
+            await _unitOfWork.SaveChangesAsync();
+            return sellOrderMatch;
         }
 
         public async Task<IEnumerable<int>> GetMatchedBuyOrders(int sellOrderId)

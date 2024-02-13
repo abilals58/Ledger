@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
@@ -15,15 +16,10 @@ namespace Ledger.Ledger.Web.Models
         public  int StockId { get; set; }
         public  double BidPrice { get; set; }
         public  int BidSize { get; set; }
-        public  DateTime DateCreated { get; set; } = DateTime.Now;
-        public  DateTime StartDate { get; set; } = DateTime.Now; // default current time,buy order is active from startdate to enddate
-        public  DateTime EndDate { get; set; } = DateTime.Now.AddDays(1); // default 1 day from startdate
         
-        public bool Status { get; set; } = true; // ture: not deleted, false: deleted
-        //public bool IsActive { get; set; } = true; // true: active, false: not active (out of working times)
-        
-        //public List<SellOrder> MatchList { get; set; } = new();
-        
+        public int CurrentBidSize { get; set; } //current available bidSize if it is 0 then buyOrder is deleted
+        public  DateTime StartDate { get; set; } = DateTime.Now.ToUniversalTime(); // buy order is active from startdate to end of the day
+        public OrderStatus Status { get; set; } = OrderStatus.Active; // showing status of the buyOrder
         
         //[ForeignKey("UserId")]
         //public User User { get; set; } //navigation property
@@ -36,20 +32,29 @@ namespace Ledger.Ledger.Web.Models
             
         }
 
-        public BuyOrder(int buyOrderId, int userId, int stockId, double bidPrice, int bidSize, bool status)
+        public BuyOrder(int buyOrderId, int userId, int stockId, double bidPrice, int bidSize)
         {
             BuyOrderId = buyOrderId;
             UserId = userId;
             StockId = stockId;
             BidPrice = bidPrice;
             BidSize = bidSize;
-            Status = status;
+            CurrentBidSize = bidSize;
+            //check whether in working hours or not 
+            if (DateTime.Now.Hour > 9 && DateTime.Now.Hour < 17)
+            {
+                Status = OrderStatus.Active;
+            }
+            else
+            {
+                Status = OrderStatus.NotYetActive;
+            }
         }
 
         public override string ToString()
         {
             return $"BuyOrderId: {BuyOrderId}, UserId: {UserId}, StockId: {StockId}, BidPrice: {BidPrice}, BidSize: {BidSize}, " +
-                   $"DateCreated: {DateCreated}, StartDate: {StartDate}, EndDate: {EndDate}, Status: {Status}";
+                   $"StartDate: {StartDate}, Status: {Status}";
         }
     }
 }

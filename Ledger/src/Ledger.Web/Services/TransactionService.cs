@@ -39,50 +39,24 @@ namespace Ledger.Ledger.Web.Services
         
         public async Task<Transaction> AddTransactionAsync(Transaction transaction)
         {
-            try
-            {
-                await _transactionRepository.AddTransactionAsync(transaction);
-                await _unitOfWork.CommitAsync();
-                return transaction;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            
+            await _transactionRepository.AddTransactionAsync(transaction);
+            await _unitOfWork.SaveChangesAsync();
+            return transaction;
         }
 
         public async Task<Transaction> UpdateTransactionAsync(int id, Transaction newtransaction)
         {
-            try
-            {
-                var transaction =  await _transactionRepository.UpdateTransactionAsync(id, newtransaction);
-                await _unitOfWork.CommitAsync();
-                return transaction;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var transaction =  await _transactionRepository.UpdateTransactionAsync(id, newtransaction);
+            await _unitOfWork.SaveChangesAsync();
+            return transaction;
         }
 
         public async Task<Transaction> DeleteTransactionAsync(int id)
         {
-            try
-            {
-                var transaction = await _transactionRepository.DeleteTransactionAsync(id);
-                await _unitOfWork.CommitAsync();
-                return transaction;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var transaction = await _transactionRepository.DeleteTransactionAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return transaction;
         }
         
         

@@ -38,54 +38,24 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<User> AddUserAsync(User user)
         {
-            try
-            { 
-                await _userRepository.AddUserAsync(user);
-                await _unitOfWork.CommitAsync();
-                return user;
-
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            await _userRepository.AddUserAsync(user);
+            await _unitOfWork.SaveChangesAsync();
+            return user;
         }
 
         public async Task<User> UpdateUserAsync(int id, User newUser)
         {
-            try
-            {
-                var user = await _userRepository.UpdateUserAsync(id, newUser);
-                await _unitOfWork.CommitAsync();
-                return user;
-
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
-            
+            var user = await _userRepository.UpdateUserAsync(id, newUser);
+            await _unitOfWork.SaveChangesAsync();
+            return user;
         }
 
         public async Task<User> DeleteUserAsync(int id)
         {
-            try
-            {
-                var user = await _userRepository.DeleteUserAsync(id);
-                await _unitOfWork.CommitAsync();
-                return user;
-
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var user = await _userRepository.DeleteUserAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return user;
+                
         }
     }
 }

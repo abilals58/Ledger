@@ -40,50 +40,23 @@ namespace Ledger.Ledger.Web.Services
 
         public async Task<Stock> AddStockAsync(Stock stock)
         {
-            try
-            {
-                 await _stockRepository.AddStockAsync(stock);
-                 await _unitOfWork.CommitAsync();
-                 return stock;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+             await _stockRepository.AddStockAsync(stock);
+             await _unitOfWork.SaveChangesAsync();
+             return stock;
         }
 
         public async Task<Stock> UpdateStockAsync(int id, Stock newStock)
         {
-            try
-            {
-                var stock =  await _stockRepository.UpdateStockAsync(id, newStock);
-                await _unitOfWork.CommitAsync();
-                return stock;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var stock =  await _stockRepository.UpdateStockAsync(id, newStock);
+            await _unitOfWork.SaveChangesAsync();
+            return stock;
         }
 
         public async Task<Stock> DeleteStockAsync(int id)
         {
-            try
-            {
-                var stock = await _stockRepository.DeleteStockAsync(id);
-                await _unitOfWork.CommitAsync();
-                return stock;
-            }
-            catch (Exception e)
-            {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
-            }
+            var stock = await _stockRepository.DeleteStockAsync(id);
+            await _unitOfWork.SaveChangesAsync();
+            return stock;
         }
 
         public async Task<List<List<object>>> RetrieveAllStockInfo()
@@ -112,36 +85,26 @@ namespace Ledger.Ledger.Web.Services
         
         public async Task<Stock> UpdateAStockPrice(int id,double newPrice)
         {
-            try
+            var stock = await _stockRepository.GetStockByIdAsync(id);
+            var updatedStock = new Stock();
+            if (stock == null) return null;
+        
+            if (newPrice < stock.LowestPrice) //update lowest price and current price as newPrice
             {
-                var stock = await _stockRepository.GetStockByIdAsync(id);
-                var updatedStock = new Stock();
-                if (stock == null) return null;
-            
-                if (newPrice < stock.LowestPrice) //update lowest price and current price as newPrice
-                {
-                    updatedStock =await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
-                }
+                updatedStock =await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, newPrice);
+            }
 
-                else if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
-                {
-                     updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
-                }
-                else{
-                    // update only current price
-                    updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
-                }
-                //commit changes 
-                await _unitOfWork.CommitAsync();
-                return updatedStock;
-            }
-            catch (Exception e)
+            else if (newPrice > stock.HighestPrice) //update highest price and current price as newPrice
             {
-                await _unitOfWork.RollBackAsync();
-                Console.WriteLine(e);
-                throw;
+                 updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, newPrice, stock.LowestPrice);
             }
-            
+            else{
+                // update only current price
+                updatedStock = await _stockRepository.UpdateStockPriceAsync(id, newPrice, stock.HighestPrice, stock.LowestPrice);
+            }
+            //commit changes 
+            await _unitOfWork.SaveChangesAsync();
+            return updatedStock;
         }
     }
 }

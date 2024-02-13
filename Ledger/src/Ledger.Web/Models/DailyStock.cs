@@ -20,7 +20,7 @@ namespace Ledger.Ledger.Web.Models
 
         public DailyStock(DateTime date, int stockId, double stockValue)
         {
-            Date = date;
+            Date = date.ToUniversalTime();
             StockId = stockId;
             StockValue = stockValue;
         }

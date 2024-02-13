@@ -6,9 +6,7 @@ namespace Ledger.Ledger.Web.Models
     public class StocksOfUser // This class refers to the raws of a table in the database which relates a user with its owning stocks. StocksOfUser table contains
                               // related information about a user's stocks; therefore, it has fields StocksOfUserId (primary key), UserId and StockId (Foreign Keys) and NumOfStocks.
     {
-        [Key]
         public  int UserId { get; set; }
-        [Key]
         public  int StockId { get; set; }
         public  int NumOfStocks { get; set; }
         

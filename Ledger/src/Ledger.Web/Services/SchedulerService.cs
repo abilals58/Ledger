@@ -12,7 +12,7 @@ namespace Ledger.Ledger.Web.Services
             IScheduler scheduler = await new StdSchedulerFactory().GetScheduler();
             await scheduler.Start();
 
-            IJobDetail job = JobBuilder.Create<TradeJob>()
+            IJobDetail job = JobBuilder.Create<SellTradeJob>()
                 .WithIdentity("tradeJob", "group1")
                 .Build();
 
