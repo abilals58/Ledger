@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "YRBOzsAkPmNZPvjjsaDkTfPiXgpRzDmcuH45YmAiiUc=",
+  "Source": "Ledger",
+  "BasePath": "_content/Ledger",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
