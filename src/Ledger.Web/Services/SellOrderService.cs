@@ -141,7 +141,7 @@ namespace Ledger.Ledger.Web.Services
             }
             Console.WriteLine(buyOrderProcess.Status);
             //change status of matched buyOrder -- buyOrderProcess is already changed
-            await _buyOrderRepository.FindAndUpdateStatus(buyOrderProcess.BuyOrderId, OrderStatus.IsMatched);
+            //await SetIsMatchedStatusBySellOrderId(buyOrderProcess.BuyOrderId); //TODO SetIsMatched
             //change status of sellOrder process and sellOrder
             sellOrderProcess.Status = OrderStatus.IsMatched;
             await _sellOrderRepository.FindAndUpdateStatus(sellOrderProcess.SellOrderId, OrderStatus.IsMatched);
@@ -155,6 +155,10 @@ namespace Ledger.Ledger.Web.Services
             await _unitOfWork.CommitAsync();
             return sellOrderProcess;
         }
+        
+        
+        private void SetIsMatchedStatusBySellOrderId(int id)
+        {}
         
         public async Task<SellOrder> OperateTradeAsync(int sellOrderId) //operate trade, form transactions
         {
