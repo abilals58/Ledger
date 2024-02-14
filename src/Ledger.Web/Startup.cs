@@ -35,14 +35,10 @@ namespace Ledger.Ledger.Web
                     .WithCronSchedule("0/5 * * * * ?")); // run every 5 seconds
                 //.WithCronSchedule("0/10 * * * * ?")); // run every 10 seconds
                 /*//.WithSimpleSchedule(x => x.WithRepeatCount(0)));
->>>>>>> f02bfce (SellOrderProcess and BuyOrderProcess added, matchSellOrder is implemented in the process scope (outbox pattern))
                 q.AddJob<BuyTradeJob>(opts => opts.WithIdentity(buyJobKey));
                 q.AddTrigger(opts => opts
                     .ForJob(buyJobKey)
                     .WithIdentity("buyTradeJob-trigger")
-<<<<<<< HEAD
-                    .WithCronSchedule("0/10 * * * * ?"));
-=======
                     .WithCronSchedule("0/10 * * * * ?"));*/
             });
 

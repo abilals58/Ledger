@@ -20,4 +20,16 @@
       <PackageReference Include="xunit" Version="2.6.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="src\Ledger.Web\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="src\Ledger.Web\appsettings.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\src\Ledger.Web\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\src\Ledger.Web\appsettings.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\Ledger.Web\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\Ledger.Web\appsettings.json" />
+      <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.deps.json" />
+      <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.runtimeconfig.dev.json" />
+      <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.runtimeconfig.json" />
+    </ItemGroup>
+
 </Project>
