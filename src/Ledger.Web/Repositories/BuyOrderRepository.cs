@@ -22,7 +22,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task LogicalDelete(int id); // change the status of buyOrder false (deleted)
         Task<BuyOrder> GetMatchedBuyOrder(SellOrder sellOrder); // returns matched buyOrderIds with given sellOrderId
         Task<IEnumerable<int>> GetLatestBuyOrderIds();
-        Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newStatus);
+        Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newOrderStatus);
     }
     
     public class BuyOrderRepository : IBuyOrderRepository // BuyOrder service coresponds to data tier and handes database operations 
@@ -144,7 +144,7 @@ namespace Ledger.Ledger.Web.Repositories
                 .ToListAsync();
         }
 
-        public async Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newStatus)
+        public async Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newOrderStatus)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(buyOrderId);
             if (buyOrder == null)
@@ -152,11 +152,7 @@ namespace Ledger.Ledger.Web.Repositories
                 return null;
             }
 
-            if (buyOrder.Status != newStatus)
-            {
-                buyOrder.Status = newStatus;
-            }
-
+            buyOrder.Status = newOrderStatus;
             return buyOrder;
         }
     }

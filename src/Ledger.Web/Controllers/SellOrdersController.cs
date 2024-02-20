@@ -40,7 +40,7 @@ namespace Ledger.Ledger.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] SellOrder sellOrder)
         {
-            await _sellOrderService.AddSellOrderAsync(sellOrder);
+            await _sellOrderService.AddSellOrderAsync(new SellOrder(sellOrder.SellOrderId, sellOrder.UserId, sellOrder.StockId, sellOrder.AskPrice, sellOrder.AskSize));
             return StatusCode(201, new{Message = "New SellOrder added to the database succesfuly!", SellOrder = sellOrder});
         }
 

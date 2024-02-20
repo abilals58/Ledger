@@ -20,6 +20,8 @@ namespace Ledger.Ledger.Web.Repositories
         Task LogicalDelete(int id);
 
         Task<SellOrder> FindAndUpdateStatus(int sellOrderId, OrderStatus newStatus);
+
+        Task<IEnumerable<SellOrder>> ChangeStatusActiveOnTheBeginningOfDay();
         //Task<IEnumerable<int>> MatchBuyOrdersAsync(int sellOrderId);
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
@@ -128,6 +130,11 @@ namespace Ledger.Ledger.Web.Repositories
                 sellOrder.Status = newStatus;
             }
             return sellOrder;
+        }
+
+        public async Task<IEnumerable<SellOrder>> ChangeStatusActiveOnTheBeginningOfDay()
+        {
+            return await _dbSellOrder.FromSqlRaw("UPDATE \"SellOrders\"\nSET \"Status\" = 1\nWHERE \"Status\" = 3\nRETURNING *").ToListAsync();
         }
     }
 }

@@ -14,14 +14,16 @@ namespace Ledger.Ledger.Web.Models
         PartiallyCompletedAndActive=2,
         [Description("Not Active, will activated on the beginning of the next day")] 
         NotYetActive = 3,
-        [Description("Matched, will be operated")] //ProcessStarting
-        IsMatched = 4,
+        [Description("Processing")] //ProcessStarting 
+        Processing = 4,
+        [Description("Matched, will be operated")] //ismatched
+        IsMatched = 5,
         [Description("Completed and deleted")] //ProcessEnding
-        CompletedAndDeleted = 5,
+        CompletedAndDeleted = 6,
         [Description("Partially completed and deleted")] //ProcessEnding
-        PartiallyCompletedAndDeleted = 6,
+        PartiallyCompletedAndDeleted = 7,
         [Description("Not completed and deleted")] //ProcessEnding
-        NotCompletedAndDeleted = 7
+        NotCompletedAndDeleted = 8
     }
     
     public class SellOrder // This class refers to the object which stores relevant information about a sell order. It has SellOrderId (primary key),
@@ -37,7 +39,7 @@ namespace Ledger.Ledger.Web.Models
         public int CurrentAskSize { get; set; } //current available askSize, if it is 0 then the sellOrder is deleted 
         public  DateTime StartDate { get; set; } = DateTime.Now.ToUniversalTime(); //sell order is active from startdate to end of the day
 
-        public OrderStatus Status { get; set; } = OrderStatus.Active; // ture: not deleted, false: deleted
+        public OrderStatus Status { get; set; } 
         
         //[ForeignKey("UserId")]
         //public User User { get; set; } //navigation property

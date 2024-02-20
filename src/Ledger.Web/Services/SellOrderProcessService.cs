@@ -7,25 +7,29 @@ namespace Ledger.Ledger.Web.Services;
 
 public interface ISellOrderProcessService
 {
-    Task<SellOrderProcess> GetFifoSellOrderProcess();
+    Task<SellOrderProcess> FindNextProcessAndSetStatusProcessing();
     Task<SellOrderProcess> UpdateOrderNum(int sellOrderProcessId);
+    Task<SellOrderProcess> SetStatusActiveBySellOrderProcessId(int sellOrderProcessId);
+    Task AddSellOrderProcessBySellOrder(SellOrder sellOrder);
 
 }
 
 public class SellOrderProcessService : ISellOrderProcessService
 {
     private ISellOrderProcessRepository _sellOrderProcessRepository;
+    private ISellOrderRepository _sellOrderRepository;
     private IUnitOfWork _unitOfWork;
 
-    public SellOrderProcessService(ISellOrderProcessRepository sellOrderProcessRepository, IUnitOfWork unitOfWork)
+    public SellOrderProcessService(ISellOrderProcessRepository sellOrderProcessRepository, ISellOrderRepository sellOrderRepository, IUnitOfWork unitOfWork)
     {
         _sellOrderProcessRepository = sellOrderProcessRepository;
+        _sellOrderRepository = sellOrderRepository;
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<SellOrderProcess> GetFifoSellOrderProcess()
+    public async Task<SellOrderProcess> FindNextProcessAndSetStatusProcessing()
     {
-        return await _sellOrderProcessRepository.GetFifoSellOrder();
+        return await _sellOrderProcessRepository.FindNextProcessAndSetStatusProcessing();
     }
 
     public async Task<SellOrderProcess> UpdateOrderNum(int sellOrderProcessId)
@@ -33,5 +37,25 @@ public class SellOrderProcessService : ISellOrderProcessService
         var sellOrderProcess = await _sellOrderProcessRepository.UpdateOrderNum(sellOrderProcessId);
         await _unitOfWork.SaveChangesAsync();
         return sellOrderProcess;
+    }
+
+    public async Task<SellOrderProcess> SetStatusActiveBySellOrderProcessId(int sellOrderProcessId)
+    {
+        var sellOrderProcess = await _sellOrderProcessRepository.FindAndUpdateStatus(sellOrderProcessId, OrderStatus.Active);
+        await _unitOfWork.SaveChangesAsync();
+        return sellOrderProcess;
+    }
+    
+    public async Task AddSellOrderProcessBySellOrder(SellOrder sellOrder) //TODO hiç çek atmadan direkt eklesin 
+    {
+        //if status != NotYetActive add sellOrderProcess
+        if (sellOrder.Status != OrderStatus.NotYetActive)
+        {
+            // add sellOrderProcess
+            await _sellOrderProcessRepository.AddSellOrderProcess(new SellOrderProcess(default, sellOrder.SellOrderId,
+                sellOrder.Status, sellOrder.StockId, sellOrder.AskPrice));
+            await _unitOfWork.SaveChangesAsync();
+        }
+            
     }
 }

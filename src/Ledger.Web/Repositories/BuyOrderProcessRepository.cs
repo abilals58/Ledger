@@ -10,7 +10,7 @@ namespace Ledger.Ledger.Web.Repositories;
 public interface IBuyOrderProcessRepository
 {
     Task AddBuyOrderProcess(BuyOrderProcess buyOrderProcess);
-    Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess);
+    Task<BuyOrderProcess> FindMatchedBuyOrderAndUpdateStatusIsMatched(SellOrderProcess sellOrderProcess);
     Task<BuyOrderProcess> FindAndUpdateStatus(int buyOrderProcessId, OrderStatus newStatus);
     Task DeleteByOrderProcessByBuyOrderId(int buyOrderId);
 }
@@ -30,20 +30,16 @@ public class BuyOrderProcessRepository :IBuyOrderProcessRepository
         await _dbBuyOrderProcess.AddAsync(buyOrderProcess);
     }
 
-    public async Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess)
+    public async Task<BuyOrderProcess> FindMatchedBuyOrderAndUpdateStatusIsMatched(SellOrderProcess sellOrderProcess)
     {
-        var buyOrderProcess = await _dbBuyOrderProcess
-            .Where(b =>
-                (b.Status == OrderStatus.Active || b.Status == OrderStatus.PartiallyCompletedAndActive) &&
-                b.StockId == sellOrderProcess.StockId && b.BidPrice == sellOrderProcess.AskPrice).OrderBy(b => b.BuyOrderId)
-            .FirstOrDefaultAsync();
-        if (buyOrderProcess == null)
+        // find matched buyOrderProcess set its status isMatched and return it (implemented in database level)
+        var buyOrderProcessList = await _dbBuyOrderProcess.FromSqlInterpolated(
+            $"UPDATE \"BuyOrderJobs\"\nSET \"Status\" = 5\nWHERE \"BuyOrderId\" = (\n    SELECT MIN(\"BuyOrderId\")\n    FROM \"BuyOrderJobs\"\n    WHERE \"Status\" IN (1, 2) AND \"StockId\" = {sellOrderProcess.StockId} AND \"BidPrice\" = {sellOrderProcess.AskPrice}\n    LIMIT 1\n)\nRETURNING *").ToListAsync();
+        if (!buyOrderProcessList.Any())
         {
             return null;
         }
-        //update the status of buyOrderProcess
-        buyOrderProcess.Status = OrderStatus.IsMatched;
-        return buyOrderProcess;
+        return buyOrderProcessList[0];
     }
 
     public async Task<BuyOrderProcess> FindAndUpdateStatus(int buyOrderProcessId, OrderStatus newStatus)

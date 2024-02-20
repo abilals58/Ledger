@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Ledger.Ledger.Web.Repositories
 {
@@ -19,10 +23,12 @@ namespace Ledger.Ledger.Web.Repositories
     public class UserRepository :IUserRepository // User service corresponds to data access tier and handles database operations
     {
         private readonly DbSet<User> _dbUser;
+        private readonly IDbContext _dbContext;
 
         public UserRepository(IDbContext dbContext)
         {
             _dbUser = dbContext.Users;
+            _dbContext = dbContext;
         }
         
         public async Task<IEnumerable<User>> GetAllUsersAsync() // returns all users 
@@ -35,9 +41,15 @@ namespace Ledger.Ledger.Web.Repositories
             return await _dbUser.FindAsync(id);
         }
         
-        public async Task<User> AddUserAsync(User user) // ads new user 
+        public async Task<User> AddUserAsync(User user) // ads new user //TODO eski haline geri getir! null reference exception oluyor
         {
-            await _dbUser.AddAsync(user);
+            var query =
+                "INSERT INTO \"Users\" (\"UserId\", \"Name\", \"Surname\", \"UserName\", \"Email\", \"Password\", \"Phone\", \"Budget\") VALUES (DEFAULT, 'John1','Doe','johndoe','johndoe@example.com','password123','1234567890',1000) RETURNING *;";//await _dbUser.AddAsync(user);
+            var query2 = "SELECT * FROM \"Users\"";
+            var users = await _dbUser.FromSqlRaw(query).ToListAsync();
+            
+            Console.WriteLine("users: "+ users[0].UserName);
+
             return user;
         }
         

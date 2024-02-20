@@ -65,9 +65,7 @@ namespace Ledger.Ledger.Web.Services
                 await _buyOrderRepository.AddBuyOrderAsync(buyOrder);
                 await _unitOfWork.SaveChangesAsync();
                 // add buy order process
-                await _buyOrderProcessRepository.AddBuyOrderProcess(new BuyOrderProcess(default, buyOrder.BuyOrderId,
-                    buyOrder.Status, buyOrder.StockId, buyOrder.BidPrice));
-                await _unitOfWork.SaveChangesAsync();
+                await this.AddBuyOrderProcessByBuyOrder(buyOrder);
                 await _unitOfWork.CommitAsync();
                 return buyOrder;
             }
@@ -263,6 +261,17 @@ namespace Ledger.Ledger.Web.Services
         public async Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId)
         {
             return await _transactionRepository.GetTransactionsOfABuyOrder(buyOrderId);
+        }
+
+        private async Task AddBuyOrderProcessByBuyOrder(BuyOrder buyOrder)
+        {
+            // if we are in working hours add buyOrderProcess
+            if (buyOrder.Status != OrderStatus.NotYetActive)
+            {
+                await _buyOrderProcessRepository.AddBuyOrderProcess(new BuyOrderProcess(default, buyOrder.BuyOrderId,
+                    buyOrder.Status, buyOrder.StockId, buyOrder.BidPrice));
+                await _unitOfWork.SaveChangesAsync();
+            }
         }
     }
 }

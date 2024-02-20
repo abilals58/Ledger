@@ -26,6 +26,8 @@ namespace Ledger.Ledger.Web.Data
         IDbContextTransaction BeginTransaction();
         IDbContextTransaction BeginSerializableTransaction();
         Task<int> SaveChangesAsync();
+        Task<int> ExecuteSqlRowAsync(string sqlCommand);
+
     }
     public class ApiDbContext : DbContext, IDbContext
     {
@@ -48,6 +50,12 @@ namespace Ledger.Ledger.Web.Data
         public DbSet<SellOrderProcess> SellOrderJobs { get; set; }
         
         public DbSet<BuyOrderProcess> BuyOrderJobs { get; set; }
+
+        public async Task<int> ExecuteSqlRowAsync(string sqlCommand) // execute giving command and return number of rows affected
+        {
+            return await base.Database.ExecuteSqlRawAsync(sqlCommand);
+        }
+        
 
         public IDbContextTransaction BeginTransaction()
         {
