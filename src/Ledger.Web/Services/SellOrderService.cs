@@ -30,9 +30,12 @@ namespace Ledger.Ledger.Web.Services
         Task<SellOrder> SetStatusProcessingBySellOrderId(int sellOrderId);
         Task<SellOrder> SetStatusActiveBySellOrderId(int sellOrderId);
         Task<IEnumerable<SellOrder>> ChangeStatusActiveOnTheBeginningOfDay(); //change status of sellOrders from NotYetActive to Active
+        Task ChangeStatusToNotCompletedAndDeleted();
+        Task ChangeStatusToPartiallyCompletedDeleted();
             
         //Task<IEnumerable<int>> GetLatestSellOrderIds();
         Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId); // returns transactions related to a sellOrder
+        
 
     }
     public class SellOrderService :ISellOrderService
@@ -131,16 +134,18 @@ namespace Ledger.Ledger.Web.Services
         
         public async Task<SellOrderProcess>  MatchSellOrderProcessAsync(SellOrderProcess sellOrderProcess) // for a sell order process, it matches first buyOrder process with same Price and id // then add matched buyOrder to the Matched List
         {
-            _unitOfWork.BeginTransaction();
+            
+            
+            //find the first matched buyOrderProcess and update its status as ismatched and return it, if not find return null
+            var buyOrderProcess = await _buyOrderProcessRepository.FindMatchedBuyOrderAndUpdateStatusIsMatched(sellOrderProcess);
+            if (buyOrderProcess == null)
+            {
+                return null;
+            }
             try
             {
-                //find the first matched buyOrderProcess and update its status as ismatched and return it, if not find return null
-                var buyOrderProcess = await _buyOrderProcessRepository.FindMatchedBuyOrderAndUpdateStatusIsMatched(sellOrderProcess);
-                if (buyOrderProcess == null)
-                {
-                    return null;
-                }
                 Console.WriteLine(buyOrderProcess.Status);
+                _unitOfWork.BeginTransaction();
                 //change status of matched buyOrder -- buyOrderProcess is already changed
                 await this.SetStatusIsMatchedByBuyOrderId(buyOrderProcess.BuyOrderId);
             
@@ -159,8 +164,8 @@ namespace Ledger.Ledger.Web.Services
             }
             catch (Exception e)
             {
-                //TODO change back to buyOrderProcess which is assigned to isMatched
-                //await SetStatusIsMatchedByBuyOrderId()
+                // change status of buyOrderProcess back to active
+                await this.SetStatusActiveByBuyOrderProcessId(buyOrderProcess.BuyOrderProcessId);
                 await _unitOfWork.RollBackAsync();
                 Console.WriteLine(e);
                 throw;
@@ -219,7 +224,6 @@ namespace Ledger.Ledger.Web.Services
             }
             catch (Exception e)
             {
-                //TODO change status of the sellOrder process and sellOrder
                 await _unitOfWork.RollBackAsync();
                 Console.WriteLine(e);
                 throw;
@@ -304,6 +308,16 @@ namespace Ledger.Ledger.Web.Services
             return await _sellOrderRepository.ChangeStatusActiveOnTheBeginningOfDay();
         }
 
+        public async Task ChangeStatusToNotCompletedAndDeleted()
+        {
+            await _sellOrderRepository.ChangeStatusToNotCompletedAndDeleted();
+        }
+
+        public async Task ChangeStatusToPartiallyCompletedDeleted()
+        {
+            await _sellOrderRepository.ChangeStatusToPartiallyCompletedDeleted();
+        }
+
         private async Task<SellOrder> SetStatusIsMatchedBySellOrderId(int sellOrderId)
         {
             var sellOrder = await _sellOrderRepository.FindAndUpdateStatus(sellOrderId, OrderStatus.IsMatched);
@@ -318,11 +332,11 @@ namespace Ledger.Ledger.Web.Services
             return buyOrder;
         }
         
-        private async Task<BuyOrder> SetStatusActiveByBuyOrderId(int buyOrderId)
+        private async Task<BuyOrderProcess> SetStatusActiveByBuyOrderProcessId(int buyOrderProcessId)
         {
-            var buyOrder = await _buyOrderRepository.FindAndUpdateStatus(buyOrderId, OrderStatus.Active);
+            var buyOrderProcess = await _buyOrderProcessRepository.FindAndUpdateStatus(buyOrderProcessId, OrderStatus.Active);
             await _unitOfWork.SaveChangesAsync();
-            return buyOrder;
+            return buyOrderProcess;
         }
 
         private async Task AddSellOrderProcessBySellOrder(SellOrder sellOrder)

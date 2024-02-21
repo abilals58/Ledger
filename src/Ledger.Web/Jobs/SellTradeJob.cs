@@ -42,7 +42,7 @@ namespace Ledger.Ledger.Web.Jobs
                 {
                     try
                     {
-                        // get the first match  //TODO Fix MatchSellOrder and implement row level lock
+                        // get the first match 
                         var result = await _sellOrderService.MatchSellOrderProcessAsync(sellOrderProcess);
                         if (result == null)
                         {

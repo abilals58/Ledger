@@ -44,7 +44,7 @@ namespace Ledger.Ledger.Web
                 q.AddJob<CloseSystemJob>(opts => opts.WithIdentity(closeJobKey));
                 q.AddTrigger(opts => opts.ForJob(closeJobKey)
                     .WithIdentity("closeSystemJob-trigger")
-                    .WithCronSchedule("0 0 18 ? * MON-FRI")); //run at 18.00 every week day
+                    .WithCronSchedule("0 1 18 ? * MON-FRI")); //run at 18.01 every week day
             });
 
             // ASP.NET Core hosting

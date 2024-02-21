@@ -13,6 +13,7 @@ public interface IBuyOrderProcessRepository
     Task<BuyOrderProcess> FindMatchedBuyOrderAndUpdateStatusIsMatched(SellOrderProcess sellOrderProcess);
     Task<BuyOrderProcess> FindAndUpdateStatus(int buyOrderProcessId, OrderStatus newStatus);
     Task DeleteByOrderProcessByBuyOrderId(int buyOrderId);
+    Task DeleteAllBuyOrderProcesses();
 }
 
 
@@ -62,5 +63,11 @@ public class BuyOrderProcessRepository :IBuyOrderProcessRepository
     {
         var buyOrderProcess = await _dbBuyOrderProcess.Where(b => b.BuyOrderId == buyOrderId).FirstOrDefaultAsync();
         _dbBuyOrderProcess.Remove(buyOrderProcess);
+    }
+
+    public async Task DeleteAllBuyOrderProcesses()
+    {
+        var buyOrderProcesses = await _dbBuyOrderProcess.ToListAsync();
+        _dbBuyOrderProcess.RemoveRange(buyOrderProcesses);
     }
 }

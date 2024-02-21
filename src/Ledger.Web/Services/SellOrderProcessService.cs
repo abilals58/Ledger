@@ -11,6 +11,7 @@ public interface ISellOrderProcessService
     Task<SellOrderProcess> UpdateOrderNum(int sellOrderProcessId);
     Task<SellOrderProcess> SetStatusActiveBySellOrderProcessId(int sellOrderProcessId);
     Task AddSellOrderProcessBySellOrder(SellOrder sellOrder);
+    Task DeleteAllSellOrderProcesses();
 
 }
 
@@ -53,5 +54,11 @@ public class SellOrderProcessService : ISellOrderProcessService
             sellOrder.Status, sellOrder.StockId, sellOrder.AskPrice));
         await _unitOfWork.SaveChangesAsync();
             
+    }
+
+    public async Task DeleteAllSellOrderProcesses()
+    {
+        await _sellOrderProcessRepository.DeleteAllSellOrderProcesses();
+        await _unitOfWork.SaveChangesAsync();
     }
 }

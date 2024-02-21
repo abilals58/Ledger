@@ -19,6 +19,7 @@ public interface ISellOrderProcessRepository
     Task<SellOrderProcess> UpdateOrderNum(int sellOrderProcessId);
 
     Task DeleteSellOrderProcessBySellOrderId(int sellOrderId);
+    Task DeleteAllSellOrderProcesses();
 }
 
 public class SellOrderProcessRepository : ISellOrderProcessRepository
@@ -86,5 +87,11 @@ public class SellOrderProcessRepository : ISellOrderProcessRepository
     {
         var sellOrderProcess = await _dbSellOrderProcess.Where(s => s.SellOrderId == sellOrderId).FirstOrDefaultAsync();
         _dbSellOrderProcess.Remove(sellOrderProcess);
+    }
+
+    public async Task DeleteAllSellOrderProcesses()
+    {
+        var sellOrderProcesses = await _dbSellOrderProcess.ToListAsync();
+        _dbSellOrderProcess.RemoveRange(sellOrderProcesses);
     }
 }

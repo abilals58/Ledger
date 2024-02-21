@@ -41,15 +41,9 @@ namespace Ledger.Ledger.Web.Repositories
             return await _dbUser.FindAsync(id);
         }
         
-        public async Task<User> AddUserAsync(User user) // ads new user //TODO eski haline geri getir! null reference exception oluyor
+        public async Task<User> AddUserAsync(User user) // ads new user //TODO tüm addler için geçerli, aldıkları parametreyi returnlemesinler, işlem başarılı ya da başarısız returnlesinler
         {
-            var query =
-                "INSERT INTO \"Users\" (\"UserId\", \"Name\", \"Surname\", \"UserName\", \"Email\", \"Password\", \"Phone\", \"Budget\") VALUES (DEFAULT, 'John1','Doe','johndoe','johndoe@example.com','password123','1234567890',1000) RETURNING *;";//await _dbUser.AddAsync(user);
-            var query2 = "SELECT * FROM \"Users\"";
-            var users = await _dbUser.FromSqlRaw(query).ToListAsync();
-            
-            Console.WriteLine("users: "+ users[0].UserName);
-
+            await _dbUser.AddAsync(user);
             return user;
         }
         

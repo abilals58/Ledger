@@ -24,6 +24,8 @@ namespace Ledger.Ledger.Web.Repositories
         Task<IEnumerable<int>> GetLatestBuyOrderIds();
         Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newOrderStatus);
         Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay();
+        Task ChangeStatusToNotCompletedAndDeleted();
+        Task ChangeStatusToPartialyCompletedAndDeleted();
     }
     
     public class BuyOrderRepository : IBuyOrderRepository // BuyOrder service coresponds to data tier and handes database operations 
@@ -162,6 +164,16 @@ namespace Ledger.Ledger.Web.Repositories
             return await _dbBuyOrder
                 .FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 1\nWHERE \"Status\" = 3\nRETURNING *")
                 .ToListAsync();
+        }
+
+        public async Task ChangeStatusToNotCompletedAndDeleted()
+        {
+            await _dbBuyOrder.FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 8\nWHERE \"Status\" = 1\nRETURNING *").ToListAsync();
+        }
+
+        public async Task ChangeStatusToPartialyCompletedAndDeleted()
+        {
+            await _dbBuyOrder.FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 7\nWHERE \"Status\" = 2\nRETURNING *").ToListAsync();
         }
     }
 }

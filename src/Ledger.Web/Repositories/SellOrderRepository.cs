@@ -22,6 +22,10 @@ namespace Ledger.Ledger.Web.Repositories
         Task<SellOrder> FindAndUpdateStatus(int sellOrderId, OrderStatus newStatus);
 
         Task<IEnumerable<SellOrder>> ChangeStatusActiveOnTheBeginningOfDay();
+
+        Task ChangeStatusToNotCompletedAndDeleted(); // active => not completed deleted
+
+        Task ChangeStatusToPartiallyCompletedDeleted(); // partially completed and active => partially completed and deleted
         //Task<IEnumerable<int>> MatchBuyOrdersAsync(int sellOrderId);
     }
     public class SellOrderRepository : ISellOrderRepository // SellOrder service corresponds to data tier and it handles database operations
@@ -135,6 +139,16 @@ namespace Ledger.Ledger.Web.Repositories
         public async Task<IEnumerable<SellOrder>> ChangeStatusActiveOnTheBeginningOfDay()
         {
             return await _dbSellOrder.FromSqlRaw("UPDATE \"SellOrders\"\nSET \"Status\" = 1\nWHERE \"Status\" = 3\nRETURNING *").ToListAsync();
+        }
+
+        public async Task ChangeStatusToNotCompletedAndDeleted()
+        {
+            await _dbSellOrder.FromSqlRaw("UPDATE \"SellOrders\"\nSET \"Status\" = 8\nWHERE \"Status\" = 1\nRETURNING *").ToListAsync();
+        }
+
+        public async Task ChangeStatusToPartiallyCompletedDeleted()
+        {
+            await _dbSellOrder.FromSqlRaw("UPDATE \"SellOrders\"\nSET \"Status\" = 7\nWHERE \"Status\" = 2\nRETURNING *").ToListAsync();
         }
     }
 }

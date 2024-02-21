@@ -36,10 +36,10 @@ namespace Ledger.Ledger.Web.Services
 
         }
 
-        public async Task<User> AddUserAsync(User user)
+        public async Task<User> AddUserAsync(User user) 
         {
             await _userRepository.AddUserAsync(user);
-            //await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
             return user;
         }
 

@@ -9,6 +9,7 @@ public interface IBuyOrderProcessService
 {
     //Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess);
     Task AddBuyOrderProcessByBuyOrder(BuyOrder buyOrder);
+    Task DeleteAllBuyOrderProcesses();
 }
 
 public class BuyOrderProcessService : IBuyOrderProcessService
@@ -32,6 +33,12 @@ public class BuyOrderProcessService : IBuyOrderProcessService
     {
         await _buyOrderProcessRepository.AddBuyOrderProcess(new BuyOrderProcess(default, buyOrder.BuyOrderId,
             buyOrder.Status, buyOrder.StockId, buyOrder.BidPrice));
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task DeleteAllBuyOrderProcesses()
+    {
+        await _buyOrderProcessRepository.DeleteAllBuyOrderProcesses();
         await _unitOfWork.SaveChangesAsync();
     }
 }
