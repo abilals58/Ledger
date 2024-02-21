@@ -23,6 +23,7 @@ namespace Ledger.Ledger.Web.Repositories
         Task<BuyOrder> GetMatchedBuyOrder(SellOrder sellOrder); // returns matched buyOrderIds with given sellOrderId
         Task<IEnumerable<int>> GetLatestBuyOrderIds();
         Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newOrderStatus);
+        Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay();
     }
     
     public class BuyOrderRepository : IBuyOrderRepository // BuyOrder service coresponds to data tier and handes database operations 
@@ -154,6 +155,13 @@ namespace Ledger.Ledger.Web.Repositories
 
             buyOrder.Status = newOrderStatus;
             return buyOrder;
+        }
+
+        public async Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay()
+        {
+            return await _dbBuyOrder
+                .FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 1\nWHERE \"Status\" = 3\nRETURNING *")
+                .ToListAsync();
         }
     }
 }

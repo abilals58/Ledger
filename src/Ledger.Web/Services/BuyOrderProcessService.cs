@@ -8,6 +8,7 @@ namespace Ledger.Ledger.Web.Services;
 public interface IBuyOrderProcessService
 {
     //Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess);
+    Task AddBuyOrderProcessByBuyOrder(BuyOrder buyOrder);
 }
 
 public class BuyOrderProcessService : IBuyOrderProcessService
@@ -27,4 +28,10 @@ public class BuyOrderProcessService : IBuyOrderProcessService
         await _unitOfWork.SaveChangesAsync();
         return buyOrderProcess;
     }*/
+    public async Task AddBuyOrderProcessByBuyOrder(BuyOrder buyOrder)
+    {
+        await _buyOrderProcessRepository.AddBuyOrderProcess(new BuyOrderProcess(default, buyOrder.BuyOrderId,
+            buyOrder.Status, buyOrder.StockId, buyOrder.BidPrice));
+        await _unitOfWork.SaveChangesAsync();
+    }
 }

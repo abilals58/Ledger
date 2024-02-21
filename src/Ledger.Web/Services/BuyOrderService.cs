@@ -21,6 +21,7 @@ namespace Ledger.Ledger.Web.Services
         Task<SellOrder> OperateSellOrderAsync(int sellOrderId, int size);
         Task<BuyOrder> OperateBuyOrderAsync(int buyOrderId, int size);
         Task<IEnumerable<int>> GetLatestBuyOrderIds();
+        Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay();
 
         Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId);
     }
@@ -258,6 +259,12 @@ namespace Ledger.Ledger.Web.Services
         {
             return await _buyOrderRepository.GetLatestBuyOrderIds();
         }
+
+        public async Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay()
+        {
+            return await _buyOrderRepository.ChangeStatusActiveOnTheBeginningOfDay();
+        }
+
         public async Task<IEnumerable<Transaction>> GetTransactionsOfABuyOrder(int buyOrderId)
         {
             return await _transactionRepository.GetTransactionsOfABuyOrder(buyOrderId);

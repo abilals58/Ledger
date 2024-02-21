@@ -8,11 +8,15 @@ namespace Ledger.Ledger.Web.Jobs
     {
         private readonly ISellOrderService _sellOrderService;
         private readonly ISellOrderProcessService _sellOrderProcessService;
+        private readonly IBuyOrderService _buyOrderService;
+        private readonly IBuyOrderProcessService _buyOrderProcessService;
 
-        public OpenSystemJob(ISellOrderService sellOrderService, ISellOrderProcessService sellOrderProcessService)
+        public OpenSystemJob(ISellOrderService sellOrderService, ISellOrderProcessService sellOrderProcessService, IBuyOrderService buyOrderService, IBuyOrderProcessService buyOrderProcessService)
         {
             _sellOrderService = sellOrderService;
             _sellOrderProcessService = sellOrderProcessService;
+            _buyOrderService = buyOrderService;
+            _buyOrderProcessService = buyOrderProcessService;
         }
         public async Task Execute(IJobExecutionContext context)
         {
@@ -24,9 +28,17 @@ namespace Ledger.Ledger.Web.Jobs
             foreach (var sellOrder in sellOrders)
             {
                 // add new sellOrderProcess
-                _sellOrderProcessService.AddSellOrderProcessBySellOrder(sellOrder); //TODO burayı incele
+                await _sellOrderProcessService.AddSellOrderProcessBySellOrder(sellOrder);
 
             }
+            //change status of all buyOrders from notyetactive to active 
+            var buyOrders = await _buyOrderService.ChangeStatusActiveOnTheBeginningOfDay();
+            //add all buyOrderProcesses
+            foreach (var buyOrder in buyOrders)
+            {
+                await _buyOrderProcessService.AddBuyOrderProcessByBuyOrder(buyOrder);
+            }
+            
         }
     }
 }

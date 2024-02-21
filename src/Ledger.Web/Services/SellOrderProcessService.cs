@@ -46,16 +46,12 @@ public class SellOrderProcessService : ISellOrderProcessService
         return sellOrderProcess;
     }
     
-    public async Task AddSellOrderProcessBySellOrder(SellOrder sellOrder) //TODO hiç çek atmadan direkt eklesin 
+    public async Task AddSellOrderProcessBySellOrder(SellOrder sellOrder) 
     {
-        //if status != NotYetActive add sellOrderProcess
-        if (sellOrder.Status != OrderStatus.NotYetActive)
-        {
-            // add sellOrderProcess
-            await _sellOrderProcessRepository.AddSellOrderProcess(new SellOrderProcess(default, sellOrder.SellOrderId,
-                sellOrder.Status, sellOrder.StockId, sellOrder.AskPrice));
-            await _unitOfWork.SaveChangesAsync();
-        }
+        // add sellOrderProcess
+        await _sellOrderProcessRepository.AddSellOrderProcess(new SellOrderProcess(default, sellOrder.SellOrderId,
+            sellOrder.Status, sellOrder.StockId, sellOrder.AskPrice));
+        await _unitOfWork.SaveChangesAsync();
             
     }
 }
