@@ -32,11 +32,8 @@ namespace Ledger.Ledger.Web.Services
         Task<IEnumerable<SellOrder>> ChangeStatusActiveOnTheBeginningOfDay(); //change status of sellOrders from NotYetActive to Active
         Task ChangeStatusToNotCompletedAndDeleted();
         Task ChangeStatusToPartiallyCompletedDeleted();
-            
-        //Task<IEnumerable<int>> GetLatestSellOrderIds();
         Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId); // returns transactions related to a sellOrder
         
-
     }
     public class SellOrderService :ISellOrderService
     {
@@ -107,30 +104,6 @@ namespace Ledger.Ledger.Web.Services
             await _unitOfWork.SaveChangesAsync();
             return sellOrder;
         }
-        /*public async Task<SellOrder>  MatchSellOrderAsync(int sellOrderId) // for a sell order, it matches first buyOrder with same Price and id // then add matched buyOrder to the Matched List
-        {
-            // get the related sellOrderProcess
-            var sellOrder = await _sellOrderRepository.GetSellOrderByIdAsync(sellOrderId);
-
-            //get the first matched buyOrder
-            var buyOrder = await _buyOrderRepository.GetMatchedBuyOrder(sellOrder);
-            if (buyOrder == null)
-            {
-                return null;
-            }
-            Console.WriteLine(buyOrder.Status);
-            //change status of sellOrder 
-            sellOrder.Status = OrderStatus.IsMatched;
-    
-            // add new match record to the database
-            await _sellOrderMatchRepository.AddSellOrderMatchAsync(sellOrderId, buyOrder.BuyOrderId);
-            
-            //persist all changes 
-            await _unitOfWork.SaveChangesAsync();
-            
-            await _unitOfWork.CommitAsync();
-            return sellOrder;
-        }*/
         
         public async Task<SellOrderProcess>  MatchSellOrderProcessAsync(SellOrderProcess sellOrderProcess) // for a sell order process, it matches first buyOrder process with same Price and id // then add matched buyOrder to the Matched List
         {
@@ -351,11 +324,6 @@ namespace Ledger.Ledger.Web.Services
             }
             
         }
-
-        /*public async Task<IEnumerable<int>> GetLatestSellOrderIds() // return the latest sellOrderIds (isMatched)
-        {
-            return await _sellOrderRepository.GetLatestSellOderIds();
-        }*/
         public async Task<IEnumerable<Transaction>> GetTransactionsOfASellOrder(int sellOrderId)
         {
             return await _transactionRepository.GetTransactionsOfASellOrder(sellOrderId);

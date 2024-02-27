@@ -35,15 +35,7 @@ namespace Ledger.Ledger.Web.Controllers
 
             return Ok(transaction);
         }
-
-        // POST: api/transactions
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Transaction transaction)
-        {
-            await _transactionService.AddTransactionAsync(transaction);
-            return StatusCode(201, new {Message = "New Transaction added to the database!", Transaction = transaction});
-        }
-
+        
         // PUT: api/transactions/id
         [HttpPut("{id}")]
         public async Task<IActionResult> Put(int id, [FromBody] Transaction newtransaction)

@@ -74,7 +74,6 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ITransactionRepository,TransactionRepository>();
             services.AddScoped<IDailyStockRepository, DailyStockRepository>();
             services.AddScoped<ISellOrderMatchRepository, SellOrderMatchRepository>();
-            services.AddScoped<IBuyOrderMatchRepository, BuyOrderMatchRepository>();
             services.AddScoped<IBuyOrderProcessRepository, BuyOrderProcessRepository>();
             services.AddScoped<ISellOrderProcessRepository, SellOrderProcessRepository>();
             

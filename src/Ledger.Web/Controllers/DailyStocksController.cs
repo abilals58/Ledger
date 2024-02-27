@@ -36,26 +36,7 @@ namespace Ledger.Ledger.Web.Controllers
             }
             return Ok(dailyStock);
         }
-
-        // POST: api/dailystocks
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] DailyStock dailyStock)
-        {
-            var dailystock = await _dailyStockService.AddDailyStockAsync(dailyStock);
-            return StatusCode(201, new {Message = "New DailyStock added to the database succesfuly!", DailyStock = dailystock});
-        }
         
-        // PUT: api/dailystocks/id/date
-        [HttpPut("{id}/{date}")]
-        public async Task<IActionResult> Put(int id, DateTime date, [FromBody] DailyStock newdailystock)
-        {
-            var dailyStock = await _dailyStockService.UpdateDailyStockAsync(id,date, newdailystock);
-            if (dailyStock == null) 
-            {
-                return NotFound("DailyStock with given date does not exist in the database!");
-            }
-            return Ok(new {Message = "DailyStock with given date updated successfuly!", DailyStock = dailyStock});
-        }
 
         // DELETE: api/dailystocks/id/date
         [HttpDelete("{id}/{date}")]
