@@ -1,8 +1,12 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Models;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 namespace Ledger.Ledger.Web.Repositories
 {
@@ -19,10 +23,12 @@ namespace Ledger.Ledger.Web.Repositories
     public class UserRepository :IUserRepository // User service corresponds to data access tier and handles database operations
     {
         private readonly DbSet<User> _dbUser;
+        private readonly IDbContext _dbContext;
 
         public UserRepository(IDbContext dbContext)
         {
             _dbUser = dbContext.Users;
+            _dbContext = dbContext;
         }
         
         public async Task<IEnumerable<User>> GetAllUsersAsync() // returns all users 
@@ -35,7 +41,7 @@ namespace Ledger.Ledger.Web.Repositories
             return await _dbUser.FindAsync(id);
         }
         
-        public async Task<User> AddUserAsync(User user) // ads new user 
+        public async Task<User> AddUserAsync(User user) // ads new user //TODO tüm addler için geçerli, aldıkları parametreyi returnlemesinler, işlem başarılı ya da başarısız returnlesinler
         {
             await _dbUser.AddAsync(user);
             return user;

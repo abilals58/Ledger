@@ -1,4 +1,6 @@
+using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Ledger.Ledger.Web.Data;
 using Ledger.Ledger.Web.Jobs;
@@ -11,12 +13,13 @@ public interface ISellOrderProcessRepository
 {
     Task AddSellOrderProcess(SellOrderProcess sellOrderProcess);
     Task<SellOrderProcess> GetSellOrderProcessById(int sellOrderProcessId);
-    Task<SellOrderProcess> GetFifoSellOrder();
+    Task<SellOrderProcess> FindNextProcessAndSetStatusProcessing();
     Task<SellOrderProcess> FindAndUpdateStatus(int sellOrderProcessId, OrderStatus newStatus);
 
     Task<SellOrderProcess> UpdateOrderNum(int sellOrderProcessId);
 
     Task DeleteSellOrderProcessBySellOrderId(int sellOrderId);
+    Task DeleteAllSellOrderProcesses();
 }
 
 public class SellOrderProcessRepository : ISellOrderProcessRepository
@@ -38,12 +41,18 @@ public class SellOrderProcessRepository : ISellOrderProcessRepository
         return await _dbSellOrderProcess.Where(s => s.SellOrderProcessId == sellOrderProcessId).FirstOrDefaultAsync();
     }
 
-    public async Task<SellOrderProcess> GetFifoSellOrder()
+    public async Task<SellOrderProcess> FindNextProcessAndSetStatusProcessing()
     {
-        //return the ordernum of the sellOrderProcess according to FIFO order (get the sellOrderProcess which has the lowest orderNum)
-        return await _dbSellOrderProcess
-            .Where(s => s.Status == OrderStatus.Active || s.Status == OrderStatus.PartiallyCompletedAndActive)
-            .OrderBy(s=>s.OrderNum).FirstOrDefaultAsync();
+        //return the sellOrderProcess according to FIFO order (get the sellOrderProcess which has the lowest orderNum)
+        //and update its status as processing
+        var NextProcessList = await _dbSellOrderProcess.FromSqlRaw(
+            "UPDATE \"SellOrderJobs\" SET \"Status\" = 4 WHERE \"OrderNum\" = (SELECT MIN(\"OrderNum\") FROM \"SellOrderJobs\" WHERE \"Status\" IN (1, 2) LIMIT 1)RETURNING *\n").ToListAsync();
+        //Console.WriteLine("id of the selected process: "+ NextProcessList[0].SellOrderProcessId);
+        if (!NextProcessList.Any())
+        {
+            return null;
+        }
+        return NextProcessList[0];
     }
 
     public async Task<SellOrderProcess> FindAndUpdateStatus(int sellOrderProcessId, OrderStatus newStatus)
@@ -78,5 +87,11 @@ public class SellOrderProcessRepository : ISellOrderProcessRepository
     {
         var sellOrderProcess = await _dbSellOrderProcess.Where(s => s.SellOrderId == sellOrderId).FirstOrDefaultAsync();
         _dbSellOrderProcess.Remove(sellOrderProcess);
+    }
+
+    public async Task DeleteAllSellOrderProcesses()
+    {
+        var sellOrderProcesses = await _dbSellOrderProcess.ToListAsync();
+        _dbSellOrderProcess.RemoveRange(sellOrderProcesses);
     }
 }

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -18,6 +19,24 @@
       <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
       <PackageReference Include="Swashbuckle.AspNetCore.SwaggerUI" Version="6.5.0" />
       <PackageReference Include="xunit" Version="2.6.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="src\Ledger.Web\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="src\Ledger.Web\appsettings.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\src\Ledger.Web\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\src\Ledger.Web\appsettings.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\Ledger.Web\appsettings.Development.json" />
+      <_ContentIncludedByDefault Remove="Ledger\src\Ledger.Web\appsettings.json" />
+      <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.deps.json" />
+      <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.runtimeconfig.dev.json" />
+      <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.runtimeconfig.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>

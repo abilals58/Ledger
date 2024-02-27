@@ -17,15 +17,15 @@ namespace Ledger.Ledger.Web.Data
         DbSet<SellOrder> SellOrders { get; set; }
         DbSet<Transaction> Transactions { get; set; }
         DbSet<DailyStock> DailyStocks { get; set; }
-        
         DbSet<SellOrderMatch> SellOrderMatches { get; set; }
-        DbSet<BuyOrderMatch> BuyOrderMatches { get; set; }
         DbSet<SellOrderProcess> SellOrderJobs { get; set; }
         DbSet<BuyOrderProcess>  BuyOrderJobs { get; set; }
 
         IDbContextTransaction BeginTransaction();
         IDbContextTransaction BeginSerializableTransaction();
         Task<int> SaveChangesAsync();
+        Task<int> ExecuteSqlRowAsync(string sqlCommand);
+
     }
     public class ApiDbContext : DbContext, IDbContext
     {
@@ -44,10 +44,15 @@ namespace Ledger.Ledger.Web.Data
         public DbSet<Transaction> Transactions { get; set; }
         public DbSet<DailyStock> DailyStocks { get; set; }
         public DbSet<SellOrderMatch> SellOrderMatches { get; set; }
-        public DbSet<BuyOrderMatch> BuyOrderMatches { get; set; }
         public DbSet<SellOrderProcess> SellOrderJobs { get; set; }
         
         public DbSet<BuyOrderProcess> BuyOrderJobs { get; set; }
+
+        public async Task<int> ExecuteSqlRowAsync(string sqlCommand) // execute giving command and return number of rows affected
+        {
+            return await base.Database.ExecuteSqlRawAsync(sqlCommand);
+        }
+        
 
         public IDbContextTransaction BeginTransaction()
         {
@@ -71,8 +76,6 @@ namespace Ledger.Ledger.Web.Data
                 .HasKey(sou => new { sou.UserId, sou.StockId });
             modelBuilder.Entity<SellOrderMatch>()
                 .HasKey(som => new { som.SellOrderId, som.BuyOrderId });
-            modelBuilder.Entity<BuyOrderMatch>()
-                .HasKey(bom => new { bom.BuyOrderId, bom.SellOrderId });
             // Additional configurations, if needed
             base.OnModelCreating(modelBuilder);
         }

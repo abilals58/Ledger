@@ -7,7 +7,9 @@ namespace Ledger.Ledger.Web.Services;
 
 public interface IBuyOrderProcessService
 {
-    Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess);
+    //Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess);
+    Task AddBuyOrderProcessByBuyOrder(BuyOrder buyOrder);
+    Task DeleteAllBuyOrderProcesses();
 }
 
 public class BuyOrderProcessService : IBuyOrderProcessService
@@ -21,10 +23,22 @@ public class BuyOrderProcessService : IBuyOrderProcessService
         _unitOfWork = unitOfWork;
     }
     
-    public async Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess)
+    /*public async Task<BuyOrderProcess> GetMatchedBuyOrderProcess(SellOrderProcess sellOrderProcess)
     {
         var buyOrderProcess = await _buyOrderProcessRepository.GetMatchedBuyOrderProcess(sellOrderProcess);
         await _unitOfWork.SaveChangesAsync();
         return buyOrderProcess;
+    }*/
+    public async Task AddBuyOrderProcessByBuyOrder(BuyOrder buyOrder)
+    {
+        await _buyOrderProcessRepository.AddBuyOrderProcess(new BuyOrderProcess(default, buyOrder.BuyOrderId,
+            buyOrder.Status, buyOrder.StockId, buyOrder.BidPrice));
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task DeleteAllBuyOrderProcesses()
+    {
+        await _buyOrderProcessRepository.DeleteAllBuyOrderProcesses();
+        await _unitOfWork.SaveChangesAsync();
     }
 }

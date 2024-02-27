@@ -25,25 +25,26 @@ namespace Ledger.Ledger.Web
             
             services.AddQuartz(q =>
             {
-                // base Quartz scheduler, job and trigger configuration
+                // sellTrade job scheduler, job and trigger configuration
                 string sellJobKey = "sellTradeJob";
-                string buyJobKey = "buyTradeJob";
                 q.AddJob<SellTradeJob>(opts => opts.WithIdentity(sellJobKey));
                 q.AddTrigger(opts => opts
                     .ForJob(sellJobKey) // link to the tradeJob
                     .WithIdentity("sellTradeJob-trigger") // give the trigger a unique name
-                    .WithCronSchedule("0/5 * * * * ?")); // run every 5 seconds
-                //.WithCronSchedule("0/10 * * * * ?")); // run every 10 seconds
-                /*//.WithSimpleSchedule(x => x.WithRepeatCount(0)));
->>>>>>> f02bfce (SellOrderProcess and BuyOrderProcess added, matchSellOrder is implemented in the process scope (outbox pattern))
-                q.AddJob<BuyTradeJob>(opts => opts.WithIdentity(buyJobKey));
-                q.AddTrigger(opts => opts
-                    .ForJob(buyJobKey)
-                    .WithIdentity("buyTradeJob-trigger")
-<<<<<<< HEAD
-                    .WithCronSchedule("0/10 * * * * ?"));
-=======
-                    .WithCronSchedule("0/10 * * * * ?"));*/
+                    .WithCronSchedule("0/5 * 9-18 ? * MON-FRI")); // run every 5 seconds //.WithSimpleSchedule(s => s.WithRepeatCount(0)));
+                // openSystem job scheduler
+                string openJobKey = "openSystemJob";
+                q.AddJob<OpenSystemJob>(opts => opts.WithIdentity(openJobKey));
+                q.AddTrigger(opts => opts.ForJob(openJobKey)
+                    .WithIdentity("openSystemJob-trigger")
+                    .WithCronSchedule("0 55 8 ? * MON-FRI")); // run at 08.55 every week day
+                
+                //close system job scheduler
+                string closeJobKey = "closeSystemJob";
+                q.AddJob<CloseSystemJob>(opts => opts.WithIdentity(closeJobKey));
+                q.AddTrigger(opts => opts.ForJob(closeJobKey)
+                    .WithIdentity("closeSystemJob-trigger")
+                    .WithCronSchedule("0 1 18 ? * MON-FRI")); //run at 18.01 every week day
             });
 
             // ASP.NET Core hosting
@@ -73,7 +74,6 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ITransactionRepository,TransactionRepository>();
             services.AddScoped<IDailyStockRepository, DailyStockRepository>();
             services.AddScoped<ISellOrderMatchRepository, SellOrderMatchRepository>();
-            services.AddScoped<IBuyOrderMatchRepository, BuyOrderMatchRepository>();
             services.AddScoped<IBuyOrderProcessRepository, BuyOrderProcessRepository>();
             services.AddScoped<ISellOrderProcessRepository, SellOrderProcessRepository>();
             
@@ -88,19 +88,10 @@ namespace Ledger.Ledger.Web
             services.AddScoped<ISellOrderMatchService, SellOrderMatchService>();
             services.AddScoped<IBuyOrderProcessService, BuyOrderProcessService>();
             services.AddScoped<ISellOrderProcessService, SellOrderProcessService>();
-            //services.AddScoped<IScheduler, SchedulerService>();
             
             //add interface for unitofwork
             services.AddTransient<IUnitOfWork, UnitOfWork.UnitOfWork>();
             services.AddTransient<SellTradeJob>();
-            
-            /*//inject scheduler 
-            services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-            services.AddSingleton<IScheduler>(provider =>
-            {
-                ISchedulerFactory schedulerFactory = new StdSchedulerFactory();
-                return schedulerFactory.GetScheduler().Result;
-            });*/
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

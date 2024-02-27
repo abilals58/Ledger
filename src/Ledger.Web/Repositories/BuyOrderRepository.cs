@@ -22,7 +22,10 @@ namespace Ledger.Ledger.Web.Repositories
         Task LogicalDelete(int id); // change the status of buyOrder false (deleted)
         Task<BuyOrder> GetMatchedBuyOrder(SellOrder sellOrder); // returns matched buyOrderIds with given sellOrderId
         Task<IEnumerable<int>> GetLatestBuyOrderIds();
-        Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newStatus);
+        Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newOrderStatus);
+        Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay();
+        Task ChangeStatusToNotCompletedAndDeleted();
+        Task ChangeStatusToPartialyCompletedAndDeleted();
     }
     
     public class BuyOrderRepository : IBuyOrderRepository // BuyOrder service coresponds to data tier and handes database operations 
@@ -144,7 +147,7 @@ namespace Ledger.Ledger.Web.Repositories
                 .ToListAsync();
         }
 
-        public async Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newStatus)
+        public async Task<BuyOrder> FindAndUpdateStatus(int buyOrderId, OrderStatus newOrderStatus)
         {
             var buyOrder = await _dbBuyOrder.FindAsync(buyOrderId);
             if (buyOrder == null)
@@ -152,12 +155,25 @@ namespace Ledger.Ledger.Web.Repositories
                 return null;
             }
 
-            if (buyOrder.Status != newStatus)
-            {
-                buyOrder.Status = newStatus;
-            }
-
+            buyOrder.Status = newOrderStatus;
             return buyOrder;
+        }
+
+        public async Task<IEnumerable<BuyOrder>> ChangeStatusActiveOnTheBeginningOfDay()
+        {
+            return await _dbBuyOrder
+                .FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 1\nWHERE \"Status\" = 3\nRETURNING *")
+                .ToListAsync();
+        }
+
+        public async Task ChangeStatusToNotCompletedAndDeleted()
+        {
+            await _dbBuyOrder.FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 8\nWHERE \"Status\" = 1\nRETURNING *").ToListAsync();
+        }
+
+        public async Task ChangeStatusToPartialyCompletedAndDeleted()
+        {
+            await _dbBuyOrder.FromSqlRaw("UPDATE \"BuyOrders\"\nSET \"Status\" = 7\nWHERE \"Status\" = 2\nRETURNING *").ToListAsync();
         }
     }
 }

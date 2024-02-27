@@ -26,11 +26,15 @@ namespace Ledger.Ledger.Web.Jobs
         {
             Console.WriteLine("SellTradeJob is executing.");
             //get sellOrderProcess according to FIFO order of ordernum
-            var sellOrderProcess = await _sellOrderProcessService.GetFifoSellOrderProcess();
+            var sellOrderProcess = await _sellOrderProcessService.FindNextProcessAndSetStatusProcessing(); // gets the next ordered process and
+                                                                                                // immediately change its status to processing
             if (sellOrderProcess != null) // if null, do nothing and try after 5 seconds 
             {
+                // update status of the sellOrder 
                 var sellOrderId = sellOrderProcess.SellOrderId;
                 var sellOrder = await _sellOrderService.GetSellOrderByIdAsync(sellOrderId);
+
+                await _sellOrderService.SetStatusProcessingBySellOrderId(sellOrderId);
             
                 // match and operate logic 
                 var endLoop = false;
@@ -38,14 +42,17 @@ namespace Ledger.Ledger.Web.Jobs
                 {
                     try
                     {
-                        // get the first match  //TODO Fix MatchSellOrder and implement row level lock
-                        var result = await _sellOrderService.MatchSellOrderProcessAsync(sellOrderProcess.SellOrderProcessId);
+                        // get the first match 
+                        var result = await _sellOrderService.MatchSellOrderProcessAsync(sellOrderProcess);
                         if (result == null)
                         {
                             endLoop = true;
-                            //1 dk sonra tekrar dene
                             // increment the order num of sellOrderProcess
                             await _sellOrderProcessService.UpdateOrderNum(sellOrderProcess.SellOrderProcessId);
+                            // if status = processing change status to Active (sellOrder and sellOrderProcess)
+                            await _sellOrderProcessService.SetStatusActiveBySellOrderProcessId(sellOrderProcess.SellOrderProcessId);
+                            await _sellOrderService.SetStatusActiveBySellOrderId(sellOrderId);
+
                         }
                         // status ==> isMatched handled in matchSellOrderProcessAsync
                         else
