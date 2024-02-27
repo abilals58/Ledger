@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,6 +31,12 @@
       <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.deps.json" />
       <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.runtimeconfig.dev.json" />
       <_ContentIncludedByDefault Remove="Ledger\bin\Debug\net5.0\Ledger.runtimeconfig.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\.dockerignore">
+        <Link>.dockerignore</Link>
+      </Content>
     </ItemGroup>
 
 </Project>
